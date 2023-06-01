@@ -1,0 +1,16 @@
+^README\.md
+^\.Rhistory
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.gitignore$
+^\.hgflow$
+^\.hgignore$
+^docs$
+^\.github$
+examples
+^pkgdown$
+^pkgdown/_pkgdown\.yml$
+^index\.md$
+^shiny_app$
+^.vscode$
+^deprecated$
