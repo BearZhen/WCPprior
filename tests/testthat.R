@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(PCWprior)
+library(WCPprior)
 
-test_check("PCWprior")
+test_check("WCPprior")

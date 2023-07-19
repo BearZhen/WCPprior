@@ -2,4 +2,4 @@
 
 export(compute_partial_arc_lengths)
 importFrom(Rcpp,evalCpp)
-useDynLib(PCWprior, .registration = TRUE)
+useDynLib(WCPprior, .registration = TRUE)

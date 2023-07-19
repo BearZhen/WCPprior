@@ -18,28 +18,42 @@ print(result)
 
 
 
+####### test interval of integration #####
+#library(rootSolve)
+f = function(x){ 
+    return(dnorm(x,mean = -0.1, sd = 0.001)*x)
+}
+a = seq(from = -100,to = 100, length.out = 20000)
+b = f(a)
+c = which(b!=0)
+a[head(c,n = 1)]
+a[tail(c,n = 1)]
+
+
+
 ######################################## test WD_function_factory ###########################################
 ## generate a function to compute Wasserstein distance between a Dirac measure and Gaussian with mean and std.
 W_func = WD_function_factory(flexible_density = dnorm, 
                   density_arg_name = x,
-                  lower_bound = -Inf,
-                  upper_bound = Inf,
+                  lower_bound = -100,
+                  upper_bound = 100,
                   para_name_flexible = c(mean,sd), 
                   s = 0, 
                   p = 2,
                   args_flexible = list() )
-W_func(0,0)
+#W_func(0,0)
 W_func(1,1)
-W_func(-0.1,0.001)
-theta_1 = seq(from = -0.1, to = 0.1, by = 0.01)
-theta_2 = seq(from = 0.01, to = 0.1, by = 0.01)
+W_func(-0.01,0.001)
+# test error
+theta_1 = seq(from = -0.1, to = 0.1, by = 0.001)
+theta_2 = seq(from = 0.001, to = 0.1, by = 0.001)
+abserror = c()
 for (i in theta_1){
   for (j in theta_2){
-    print(c(i,j))
-    print(W_func(i,j))
-    
+    abserror = c(abserror, abs(sqrt(i^2+j^2)-W_func(i,j)) )
   }
 }
+
 ################################################# finished testing ##########################################
 
 
@@ -85,6 +99,10 @@ for (i in theta_1){
 ######################### to be continued from above ##################
 
 
+
+
+
+####################
 # library(INLA)
 # theta1 = seq(from = -0.1, to = 0.1, by = 0.01)
 # theta2 = seq(from = 0.001, to = 0.1, by = 0.01)

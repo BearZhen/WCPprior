@@ -13,7 +13,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // compute_partial_arc_lengths
 Eigen::MatrixXd compute_partial_arc_lengths(Eigen::MatrixXd coords);
-RcppExport SEXP _PCWprior_compute_partial_arc_lengths(SEXP coordsSEXP) {
+RcppExport SEXP _WCPprior_compute_partial_arc_lengths(SEXP coordsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -24,11 +24,11 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_PCWprior_compute_partial_arc_lengths", (DL_FUNC) &_PCWprior_compute_partial_arc_lengths, 1},
+    {"_WCPprior_compute_partial_arc_lengths", (DL_FUNC) &_WCPprior_compute_partial_arc_lengths, 1},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_PCWprior(DllInfo *dll) {
+RcppExport void R_init_WCPprior(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
