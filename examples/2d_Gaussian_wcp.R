@@ -1,6 +1,7 @@
 library(INLA)
 library(excursions)
 library(sp)
+library(WCPprior)
 # theta1 is mean, theta2 is std
 # theta1 = seq(from = -0.15, to = 0.15, by = 0.001)
 # theta2 = seq(from = 0.0001, to = 0.15, by = 0.001)
@@ -333,11 +334,11 @@ result = WCP_2D_grid_density( theta1_M_low = -0.15
 eta = 1
 coord = result[[1]]
 distance = sqrt(coord[,1]^2+coord[,2]^2)
-distance_set[[i]] = 
+distance_set[[i]] = distance
 approx_WCP_density = result[[2]]
 true_WCP_density = ( 1/sqrt(coord[,1]^2+coord[,2]^2) ) * eta * exp(-eta * sqrt(coord[,1]^2+coord[,2]^2))/pi
 relative_abs_error = abs(approx_WCP_density - true_WCP_density)/abs(true_WCP_density)
-
+error_set[[i]] = relative_abs_error
 max_r_error = c(max_r_error, max(relative_abs_error))
 average_r_error = c(average_r_error, sum(relative_abs_error)/length(relative_abs_error))
 }

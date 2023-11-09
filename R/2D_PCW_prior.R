@@ -242,17 +242,9 @@ theta1 = c(theta1, theta1_up)
 theta1 = union(theta1,theta1)
 theta2 = c(theta2, theta2_up)
 theta2 = union(theta2,theta2)
-theta1_list = c()
-theta2_list = c()
-grid_coord = c()
-for (i in theta1){
-  for (j in theta2){
-    theta1_list = c(theta1_list,i)
-    theta2_list = c(theta2_list,j)
-  }
-}
-grid_coord = as.matrix(rbind(theta1_list, theta2_list))
-grid_coord = t(grid_coord)
+grid_coord = expand.grid(theta1,theta2)
+grid_coord = as.matrix(grid_coord)
+#grid_coord = t(grid_coord)
 return(grid_coord)
 }
 
@@ -489,6 +481,7 @@ approx_WCP_density = eta * detJ_abs * exp(-eta * W_value)/tarc
 result = list()
 result[[1]] = coord
 result[[2]] = approx_WCP_density
+result[[3]] = mesh$n
 return(result)
 }
 
