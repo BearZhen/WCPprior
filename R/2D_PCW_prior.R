@@ -248,6 +248,10 @@ grid_coord = as.matrix(grid_coord)
 return(grid_coord)
 }
 
+
+
+
+
 WCP_2D_grid_density = function( theta1_M_low 
                           ,theta1_M_up 
                           ,theta1_M_step 
@@ -491,3 +495,26 @@ return(result)
 
 
 
+
+
+WCP_2D_grid_density = function( theta1_M_low 
+                          ,theta1_M_up 
+                          ,theta1_M_step 
+                          ,theta2_M_low 
+                          ,theta2_M_up 
+                          ,theta2_M_step 
+                          ,W_func
+                          ,theta1_D_low 
+                          ,theta1_D_up 
+                          ,theta1_D_step 
+                          ,theta2_D_low 
+                          ,theta2_D_up 
+                          ,theta2_D_step
+                          ,eta
+){
+
+
+
+
+
+}

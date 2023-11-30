@@ -126,6 +126,7 @@ while(length(index) > 0){
   levelcurve = tricontourmap(mesh, z = approx_W,
                              #tol = 1e-6,
                              levels = c(W))$contour
+  
   temp = try(coordinates(levelcurve)[[1]][[1]], silent = FALSE)
   if ('try-error' %in% class(temp)){
     for (i in grid_level_curve_index){
@@ -206,6 +207,14 @@ approx_WCP_density = eta * approx_detJ_abs * exp(-eta * approx_W[index])/tarc[in
 true_WCP_density = ( 1/sqrt(mesh$loc[index,1]^2 + mesh$loc[index,2]^2) ) * eta * exp(-eta * sqrt(mesh$loc[index,1]^2+mesh$loc[index,2]^2))/pi
 abs_error = abs(approx_WCP_density - true_WCP_density)
 L1_error = sum(abs_error, na.rm = TRUE)*pi*(0.1)^2/sum(!is.na(abs_error))
+
+
+
+
+
+
+
+
 
 data = cbind(as.vector(mesh$loc[index,1]),as.vector(mesh$loc[index,2]),as.vector(approx_WCP_density))
 data = data.frame(data)

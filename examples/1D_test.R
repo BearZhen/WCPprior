@@ -1,5 +1,3 @@
-
-# function to compute gradient
 my.grad = function(func, x){
   eps = 1e-6
   return ((func(x + eps)-func(x))/eps)
@@ -8,14 +6,17 @@ my.grad = function(func, x){
   #return (grad(func, x))
 }
 
+
 # 1d WCP prior density
-wcp_density_1d = function(base_theta, L, U, W_func, eta, cutoff, mesh_width){
+wcp_density_1d = function(base_theta, L, U, W_func, eta, cutoff = NULL, mesh_width){
   # determine an upper bound for W
-  W_upper_bound = -log(cutoff)/eta
-   
+
+  
+
   if (L == -Inf & base_theta == U){
     
   } else if (U == Inf & base_theta == L) {
+    W_upper_bound = -log(cutoff)/eta
     N = L
     current_W = W_func(N)
     
@@ -48,15 +49,18 @@ wcp_density_1d = function(base_theta, L, U, W_func, eta, cutoff, mesh_width){
     #density_discrete = my.grad(W_fun,mesh)*eta*exp(-eta*W_func(mesh))
     
     
-  } else if (two sided case){
-    
+  } else if (U < Inf & base_theta == L){
+    # create mesh
+    mesh = seq(from = L,to = U, by = mesh_width)
+    # add Z_star to the mesh if it is not included
+    #mesh = union(mesh, U)
   } else {
     stop("Fail to fina an upper bound for the Wasserstein distance.")
   }
   
   
   
-
+  
   # obtain the Wasserstein-2 distance W(xi)
   W = W_func(mesh)
   # obtain dw/dxi
@@ -65,3 +69,13 @@ wcp_density_1d = function(base_theta, L, U, W_func, eta, cutoff, mesh_width){
   density_discrete = abs(dwdxi)*eta*exp(-eta*W)
   return (density_discrete)
 }
+
+
+W_func = function(xi){
+  return(xi/(1-xi))
+}
+
+density = wcp_density_1d(base_theta = 0, L = 0, U = 1, W_func = W_func, eta = 4.6, cutoff = NULL, mesh_width = 0.003)
+
+
+
