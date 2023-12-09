@@ -15,7 +15,7 @@ W_func = function(mean, sd){
 }
 
 cutoff = 0.01
-mesh_width = 0.005
+mesh_width_set = c(0.004,0.005)
 eta = 46
 
 base_theta1 = 0
@@ -28,7 +28,11 @@ U2 = Inf
 
 # find the upper bound of W based on the cutoff parameter
 W_upper_bound = -log(cutoff)/eta
+W_lower_bound = 0.001
 
+TE = c()
+TE2 = c()
+for (mesh_width in mesh_width_set){
 Z_star = NA
 boundary_path = c()
 # theta2 is bounded, theta1 is one side bounded
@@ -262,7 +266,7 @@ boundary_path = matrix(boundary_path, ncol = 2)
      #boundary = fm_nonconvex_hull( boundary_path, convex = 0.1)
 #    ,max.edge = 0.1
 #)
-mesh = fm_mesh_2d(boundary = fm_segm( boundary_path, is.bnd = TRUE), max.edge = 0.004)
+mesh = fm_mesh_2d(boundary = fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width)
 plot(mesh,axes = TRUE)
 
 weights = numeric()
@@ -288,16 +292,24 @@ approx_W  = as.vector(approx_W)
 
 #reordered_weights = weights[ordering]
 
-#parc = numeric(length(weights))
+
+#coord = mesh$loc
 parc = numeric(length(approx_W))
 tarc = numeric(length(approx_W))
-#tarc = numeric(length(weights))
+W_upper_bound = 0.1
+W_lower_bound = 0.001
 NA_index = which(approx_W > W_upper_bound)
-#NA_index = which(weights > W_upper_bound)
 parc[NA_index] = NA
 tarc[NA_index] = NA
-index = which(approx_W <= W_upper_bound)
-#index = which(weights <= W_lower_bound)
+NA_index = which(approx_W < W_lower_bound)
+parc[NA_index] = NA
+tarc[NA_index] = NA
+index1 = which(approx_W <= W_upper_bound)
+index2 = which(approx_W >= W_lower_bound)
+index = intersect(index1, index2)
+
+
+
 while(length(index) > 0){
   #print(index)
   # obtain the current Wasserstein distance
@@ -323,7 +335,7 @@ while(length(index) > 0){
   # obtain the coordinates of all the discrete points of the level curve
   line_coord = coordinates(levelcurve)[[1]][[1]]
   # abandon incomplete curves, this part need to be adjusted according to the geometry of the computation domain
-  if (line_coord[1,2] - theta2_low > 0.005 | line_coord[length(line_coord[,1]),2] - theta2_low > 0.005){
+  if (line_coord[1,2] - theta2_low > mesh_width | line_coord[length(line_coord[,1]),2] - theta2_low > mesh_width){
     for (i in grid_level_curve_index){
       parc[i] = NA
       tarc[i] = NA
@@ -332,8 +344,8 @@ while(length(index) > 0){
     next
   }
   
-  
   levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3]
+  levelcurve_parc = levelcurve_parc + theta2_low 
   # obtain the partial arc length of the grid point 
   for (i in grid_level_curve_index){
     print(i)
@@ -406,26 +418,29 @@ abs_error = abs(approx_WCP_density - true_WCP_density)
 
 
 TVD_error = 0.5 * sum(abs_error, na.rm = TRUE)*pi*(0.1)^2/sum(!is.na(abs_error))
-
+TE = c(TE, TVD_error)
 TVD_error2 = 0.5 * sum(abs_error, na.rm = TRUE)*mesh_width^2
-
+TE2 = c(TE2, TVD_error2)
 #TVD_error_1 = 0.5 * sum(abs_error_1, na.rm = TRUE)*pi*(0.1)^2/sum(!is.na(abs_error_1))
 
+}
 
 
-data = cbind(as.vector(mesh$loc[index,1]),as.vector(mesh$loc[index,2]),as.vector(abs_error))
-data = data.frame(data)
-g = ggplot(data, aes(X1, X2, color = X3))+
-  geom_point(size = 0.5)+
-  scale_color_gradient(low="blue", high="red") +
-  labs(x = expression(theta[1]), y = expression(theta[2])) + 
-  guides(col = guide_colourbar(title = "Density"))+
-  theme(legend.position = "top",
-        legend.key.height = unit(0.1, 'cm'), #change legend key height
-        legend.key.width = unit(0.5, 'cm'), #change legend key width
-        legend.title = element_text(size=7), #change legend title font size
-        legend.text = element_text(size=5),#change legend text font size
-        axis.text=element_text(size=7),
-        axis.title=element_text(size=7)) 
-g
+
+
+# data = cbind(as.vector(mesh$loc[index,1]),as.vector(mesh$loc[index,2]),as.vector(abs_error))
+# data = data.frame(data)
+# g = ggplot(data, aes(X1, X2, color = X3))+
+#   geom_point(size = 0.5)+
+#   scale_color_gradient(low="blue", high="red") +
+#   labs(x = expression(theta[1]), y = expression(theta[2])) + 
+#   guides(col = guide_colourbar(title = "Density"))+
+#   theme(legend.position = "top",
+#         legend.key.height = unit(0.1, 'cm'), #change legend key height
+#         legend.key.width = unit(0.5, 'cm'), #change legend key width
+#         legend.title = element_text(size=7), #change legend title font size
+#         legend.text = element_text(size=5),#change legend text font size
+#         axis.text=element_text(size=7),
+#         axis.title=element_text(size=7)) 
+# g
 

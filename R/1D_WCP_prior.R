@@ -48,9 +48,7 @@ wcp_density_1d = function(base_theta, L, U, W_func, eta, cutoff, mesh_width){
     #density_discrete = my.grad(W_fun,mesh)*eta*exp(-eta*W_func(mesh))
     
     
-  } else if (two sided case){
-    
-  } else {
+  }  else {
     stop("Fail to fina an upper bound for the Wasserstein distance.")
   }
   
