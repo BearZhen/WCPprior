@@ -39,7 +39,7 @@ WCP_1D_AR1_analytic = function(phi,
 #' @return A value of density evaluated at c(sigma, xi).
 #' @export
 #'
-WCP_2D_GP_analytic = function(xi,
+WCP_1D_GP_analytic = function(xi,
                               eta){
   if (xi < 0 | xi >= 1) {
     stop("xi should be a value in [0,1)!")
