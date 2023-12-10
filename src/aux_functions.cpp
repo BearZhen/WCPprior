@@ -33,15 +33,26 @@ Eigen::MatrixXd compute_partial_arc_lengths(Eigen::MatrixXd coords) {
     // }  
     
     // Trapezoidal rule
+    // arc_lengths(coords.rows()-1) = 0; 
+    // Eigen::VectorXd v = coords.row(coords.rows()-1) - coords.row(coords.rows()-2);
+    // arc_lengths(coords.rows()-2) = arc_lengths(coords.rows()-1) + v.norm();  
+    // for(i = coords.rows()-2; i > 0; i--){
+    //     Eigen::VectorXd v1 = coords.row(i) - coords.row(i-1);
+    //     Eigen::VectorXd v2 = coords.row(i+1) - coords.row(i);
+    //     v2(1) = v2(1)/v2(0)*v1(0);
+    //     v2(0) = v1(0);
+    //     arc_lengths(i-1) = arc_lengths(i) + (v1.norm() + v2.norm())/2;
+    // } 
     arc_lengths(coords.rows()-1) = 0; 
     Eigen::VectorXd v = coords.row(coords.rows()-1) - coords.row(coords.rows()-2);
     arc_lengths(coords.rows()-2) = arc_lengths(coords.rows()-1) + v.norm();  
-    for(i = coords.rows()-2; i > 0; i--){
-        Eigen::VectorXd v1 = coords.row(i) - coords.row(i-1);
-        Eigen::VectorXd v2 = coords.row(i+1) - coords.row(i);
-        v2(1) = v2(1)/v2(0)*V1(0);
-        v2(0) = v1(0);
-        arc_lengths(i-1) = arc_lengths(i) + (v1.norm() + v2.norm())/2;
+    for(i = coords.rows()-1; i > 0; i--){
+      Eigen::VectorXd v1 = coords.row(i) - coords.row(i-1);
+      // Eigen::VectorXd v2 = coords.row(i+1) - coords.row(i);
+      // v2(1) = v1(0) * v2(1)/v2(0);
+      // v2(0) = v1(0);
+      // arc_lengths(i-1) = arc_lengths(i) + (v1.norm() + v2.norm())/2;
+      arc_lengths(i-1) = arc_lengths(i) + v1.norm();
     } 
     
     
