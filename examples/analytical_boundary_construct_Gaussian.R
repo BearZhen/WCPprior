@@ -46,13 +46,13 @@ analytical_boundary_Gaussian = function(cutoff_out,
 }
 
 
-boundary_path = analytical_boundary_Gaussian(cutoff_out = 0.01/2,
-                                                        cutoff_inner = 0.01/2,
-                                                        eta = 1,
-                                                        lift = 0.0001,
-                                                        arc_width = 0.003)
-plot(boundary_path[,1], boundary_path[,2],pch = '.')
-plot(boundary_path[,1], boundary_path[,2],pch = '.')
-library(fmesher)
-mesh = fm_mesh_2d(boundary = fm_segm( boundary_path, is.bnd = TRUE), max.edge = 0.5)
-plot(mesh,axes = TRUE)
+# boundary_path = analytical_boundary_Gaussian(cutoff_out = 0.01/2,
+#                                                         cutoff_inner = 0.01/2,
+#                                                         eta = 1,
+#                                                         lift = 0.0001,
+#                                                         arc_width = 0.003)
+# plot(boundary_path[,1], boundary_path[,2],pch = '.')
+# plot(boundary_path[,1], boundary_path[,2],pch = '.')
+# library(fmesher)
+# mesh = fm_mesh_2d(boundary = fm_segm( boundary_path, is.bnd = TRUE), max.edge = 0.5)
+# plot(mesh,axes = TRUE)

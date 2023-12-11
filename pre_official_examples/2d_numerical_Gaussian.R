@@ -38,7 +38,7 @@ result = WCP_2D_Numerical_Density(boundary_path = boundary_path,
                         W_lower_bound = W_lower_bound,
                         W_upper_bound = W_upper_bound,
                         eta = 1,
-                        L1 = L1, U1 = U1, L2 = L2, U2 = U2,
+                        L2 = L2, U2 = U2,
                         level_curve_type = 'LL',
                         lc_multiplier = 20,
                         NumCores = 3)

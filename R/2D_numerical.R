@@ -17,8 +17,6 @@
 #' @return A list of density locations, densities evaluated on those locations and other utilities that can help access accuracy.
 #' @export
 #'
-
-
 WCP_2D_Numerical_Density = function(boundary_path,
                           W_func,
                           mesh_width,

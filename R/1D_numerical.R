@@ -233,7 +233,11 @@ WCP_1D_Numerical_Density= function(base_theta,
   
   # return the value of density
   density_discrete = absJ*eta*exp(-eta*W)
-  result = list(location, density_discrete)
+  # for INLA
+  prior_table = paste0("table: ",
+                        paste(c(location, density_discrete), collapse = " ")
+  )
+  result = list(location, density_discrete, prior_table)
   return (result)
 }
 

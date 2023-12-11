@@ -5,7 +5,6 @@
 #' @title Compute partial arc lengths
 #' @description Computes the partial arc lengths from a matrix of coordinates of a SpatialLine
 #' @param coords [nx2 matrix] Matrix of the points of the lines
-#' @export
 compute_partial_arc_lengths <- function(coords) {
     .Call(`_WCPprior_compute_partial_arc_lengths`, coords)
 }

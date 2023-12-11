@@ -1,51 +1,98 @@
 #' The 1d analytic density WCP prior for phi of stationary AR1 process
 #'
-#' @param phi phi parameter.
+#' @param seq_phi A vector of values of phi parameter.
 #' @param eta User specified parameter of the WCP prior.
 #' @param n Length of AR1 process. 
 #' @param sigma Standard deviation of the process.
 #'
-#' @return A value of density evaluated at c(mean, std).
+#' @return A list including densities on seq_phi and a inla table
 #' @export
 #'
-WCP_1D_AR1_analytic = function(phi, 
+WCP_1D_AR1_analytic = function(seq_phi, 
                                eta,
                                n,
                                sigma){
   if (n < 1 ) {
     stop("n should be no less than 1!")
   }
-  if (phi < -1 | phi >=1 ) {
-    stop("phi should be in [-1, 1)!")
-  }
   if (sigma <= 0 ) {
     stop("sigma should be positive!")
   }
-  
-  f = sqrt(n*(1 - phi^2) - 2*phi*(1 - phi^n))
-  c = sigma * sqrt( 2*n - sqrt(2)*sqrt(1 - (-1)^n) )
-  J = sigma/sqrt(2) * ( (n*phi^n - 1 + phi^n - n*phi)*(1 - phi) + f^2 )/( f*sqrt(n - f/(1-phi))*(1 - phi)^2 )
-  density = abs(J)*eta*exp(-2*eta*sigma^2* (n - f/(1 - phi) )  )/(1 - exp(-eta*c))
-  return (density)
+  density = numeric()
+  for (i in 1:length(seq_phi)){
+    phi = seq_phi[i]
+    if (phi < -1 | phi >=1 ) {
+      stop("phi should be in [-1, 1)!")
+    }
+    f = sqrt(n*(1 - phi^2) - 2*phi*(1 - phi^n))
+    c = sigma * sqrt( 2*n - sqrt(2)*sqrt(1 - (-1)^n) )
+    J = sigma/sqrt(2) * ( (n*phi^n - 1 + phi^n - n*phi)*(1 - phi) + f^2 )/( f*sqrt(n - f/(1-phi))*(1 - phi)^2 )
+    density[i] = abs(J)*eta*exp(-2*eta*sigma^2* (n - f/(1 - phi) )  )/(1 - exp(-eta*c))
+  }
+  # inla table
+  inla.prior.table = paste0("table: ",
+                        paste(c(seq_phi, density), collapse = "")
+  )
+  result = list(seq_phi, density, inla.prior.table)
+  return (result)
   
 }
+
 
 
 #' The 1d analytic density WCP prior for xi of generalized Pareto distribution
 #'
-#' @param xi Xi parameter. 
+#' @param seq_xi A vector of values of xi parameter. 
 #' @param eta User specified parameter of the WCP prior.
 #'
-#' @return A value of density evaluated at c(sigma, xi).
+#' @return A list including densities on seq_xi and a inla table
 #' @export
 #'
-WCP_1D_GP_analytic = function(xi,
+WCP_1D_GP_analytic = function(seq_xi,
                               eta){
-  if (xi < 0 | xi >= 1) {
-    stop("xi should be a value in [0,1)!")
+  
+  density = numeric()
+  for (i in 1:length(seq_xi)){
+    xi = seq_xi[i]
+    if (xi < 0 | xi >= 1) {
+      stop("xi should be a value in [0,1)!")
+    }
+    density[i] = eta/(1 - xi)^2 * exp( - eta * xi/(1 - xi) )
   }
-  density = eta/(1 - xi)^2 * exp( - eta * xi/(1 - xi) )
-  return (density)
+  # inla table
+  inla.prior.table = paste0("table: ",
+                            paste(c(seq_xi, density), collapse = "")
+  )
+  result = list(seq_xi, density, inla.prior.table )
+  return (result)
 }
+
+#' The 1d analytic density WCP2 prior for tau (1/variance) of Gaussian distribution
+#'
+#' @param seq_xi A vector of values of xi parameter. 
+#' @param eta User specified parameter of the WCP prior.
+#'
+#' @return A list including densities on seq_tau and a inla table
+#' @export
+#'
+WCP_1D_Gaussian_precision_analytic = function(seq_tau,
+                              eta){
+
+  density = numeric()
+  for (i in 1:length(seq_tau)){
+    tau = seq_tau[i]
+    if (tau < 0 ) {
+      stop("tau should be a positive value!")
+    }
+    density[i] = 0.5 * tau^(-3/2) * eta *exp( -eta * tau^(-1/2))
+  }
+  # inla table
+  inla.prior.table = paste0("table: ",
+                            paste(c(seq_tau, density), collapse = "")
+  )
+  result = list(seq_tau, density, inla.prior.table )
+  return (result)
+}
+
 
   
