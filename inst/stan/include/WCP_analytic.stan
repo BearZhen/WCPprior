@@ -47,6 +47,28 @@ real WCP_1D_Gaussian_mean_analytic_log(real x, real eta){
     return ldensity;
 }
 
+//  2d analytic density WCP prior for mean and standard deviation of Gaussian distribution
+real WCP_2D_Gaussian_analytic_log(vector x, real eta, real base_m){
+  // x[1] is mean parameter, x[2] is standard deviation parameter
+  real density;
+  real ldensity;
+  density = eta/sqrt( (x[1] - base_m )^2 + x[2]^2) * exp(-eta * sqrt( (x[1] - base_m )^2 + x[2]^2))/pi;
+  ldensity = log(density);
+  return ldensity;
+  
+}
+
+
+//  2d analytic density WCP prior for sigma and xi of generalized Pareto distribution
+real WCP_2D_GP_analytic_log(vector x, real eta){
+  // x[1] is sigma, x[2] is xi
+  real density;
+  real ldensity;
+  density = eta/(1 - x[2]) * exp(-eta * x[1]/(1 - x[2]) );
+  ldensity = log(density);
+  return ldensity;
+  
+}
 
 
 

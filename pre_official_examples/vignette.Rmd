@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-In this vignette, we will show how to use the WCPprior package to construct 1D, 2D WCP prior.
+In this vignette, we will show how to use the WCPprior package to obtain 1D and 2D numerical and analytic WCP prior.
 
 First, we import the library.
 ```{r}

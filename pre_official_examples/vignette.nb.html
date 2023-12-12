@@ -1753,12 +1753,14 @@ display: none;
 
 <!-- rnb-text-begin -->
 <p>In this vignette, we will show how to use the WCPprior package to
-construct 1D, 2D WCP prior.</p>
+obtain 1D and 2D numerical and analytic WCP prior.</p>
 <p>First, we import the library.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShXQ1BwcmlvcilcbmBgYCJ9 -->
-<pre class="r"><code>library(WCPprior)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlicmFyeShXQ1BwcmlvcilcbmBgYFxuYGBgIn0= -->
+<pre class="r"><code>```r
+library(WCPprior)</code></pre>
+<p>```</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1775,7 +1777,7 @@ freedom parameter, of the t-distribution.</p>
 <p>Examples with 1D and 2D analytic function.</p>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyB2aWduZXR0ZSwgd2Ugd2lsbCBzaG93IGhvdyB0byB1c2UgdGhlIFdDUHByaW9yIHBhY2thZ2UgdG8gY29uc3RydWN0IDFELCAyRCBXQ1AgcHJpb3IuCgpGaXJzdCwgd2UgaW1wb3J0IHRoZSBsaWJyYXJ5LgpgYGB7cn0KbGlicmFyeShXQ1BwcmlvcikKYGBgCgoKQW4gZXhhbXBsZSB3aXRoIG51bWVyaWNhbCBhcHByb3hpbWF0aW9uIG9mIDJkIFdDUDEgcHJpb3Igb2YgJFxzaWdtYSQgYW5kICRceGkkIG9mIGdlbmVyYWxpemVkIFBhcmV0byBkaXN0cmlidXRpb24uCgpjb21wdXRhdGlvbmFsIGRvbWFpbgoKYm91bmRhcnkgY29uc3RydWN0aW9uCgp1c2luZyB0aGUgV0NQIDJkIGZ1bmN0aW9uCgpzaG93cyB0aGUgVFZEIGVycm9yCgpBbiBleGFtcGxlIHdpdGggbnVtZXJpY2FsIGFwcHJveGltYXRpb24gb2YgMWQgV0NQMiBwcmlvciBvZiAkXHhpID0gMS9cbnUkLCB0aGUgcmVjaXByb2NhbCBvZiBkZWdyZWUgb2YgZnJlZWRvbSBwYXJhbWV0ZXIsIG9mIHRoZSB0LWRpc3RyaWJ1dGlvbi4KCmNvbXB1dGF0aW9uYWwgZG9tYWluCgp1c2luZyB0aGUgV0NQIDFkIGZ1bmN0aW9uCgpFeGFtcGxlcyB3aXRoIDFEIGFuZCAyRCBhbmFseXRpYyBmdW5jdGlvbi4KCgoKCgoKCgoKCgoKCgoKCgoKCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyB2aWduZXR0ZSwgd2Ugd2lsbCBzaG93IGhvdyB0byB1c2UgdGhlIFdDUHByaW9yIHBhY2thZ2UgdG8gb2J0YWluIDFEIGFuZCAyRCBudW1lcmljYWwgYW5kIGFuYWx5dGljIFdDUCBwcmlvci4KCkZpcnN0LCB3ZSBpbXBvcnQgdGhlIGxpYnJhcnkuCmBgYHtyfQpsaWJyYXJ5KFdDUHByaW9yKQpgYGAKCgpBbiBleGFtcGxlIHdpdGggbnVtZXJpY2FsIGFwcHJveGltYXRpb24gb2YgMmQgV0NQMSBwcmlvciBvZiAkXHNpZ21hJCBhbmQgJFx4aSQgb2YgZ2VuZXJhbGl6ZWQgUGFyZXRvIGRpc3RyaWJ1dGlvbi4KCmNvbXB1dGF0aW9uYWwgZG9tYWluCgpib3VuZGFyeSBjb25zdHJ1Y3Rpb24KCnVzaW5nIHRoZSBXQ1AgMmQgZnVuY3Rpb24KCnNob3dzIHRoZSBUVkQgZXJyb3IKCkFuIGV4YW1wbGUgd2l0aCBudW1lcmljYWwgYXBwcm94aW1hdGlvbiBvZiAxZCBXQ1AyIHByaW9yIG9mICRceGkgPSAxL1xudSQsIHRoZSByZWNpcHJvY2FsIG9mIGRlZ3JlZSBvZiBmcmVlZG9tIHBhcmFtZXRlciwgb2YgdGhlIHQtZGlzdHJpYnV0aW9uLgoKY29tcHV0YXRpb25hbCBkb21haW4KCnVzaW5nIHRoZSBXQ1AgMWQgZnVuY3Rpb24KCkV4YW1wbGVzIHdpdGggMUQgYW5kIDJEIGFuYWx5dGljIGZ1bmN0aW9uLgoKCgoKCgoKCgoKCgoKCgoKCgoKCg==</div>
 
 
 
