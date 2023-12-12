@@ -11,7 +11,8 @@
 WCP_1D_AR1_analytic = function(seq_phi, 
                                eta,
                                n,
-                               sigma){
+                               sigma,
+                               inla_table){
   if (n < 1 ) {
     stop("n should be no less than 1!")
   }
@@ -29,11 +30,15 @@ WCP_1D_AR1_analytic = function(seq_phi,
     J = sigma/sqrt(2) * ( (n*phi^n - 1 + phi^n - n*phi)*(1 - phi) + f^2 )/( f*sqrt(n - f/(1-phi))*(1 - phi)^2 )
     density[i] = abs(J)*eta*exp(-2*eta*sigma^2* (n - f/(1 - phi) )  )/(1 - exp(-eta*c))
   }
+  if (inla_table){
   # inla table
   inla.prior.table = paste0("table: ",
                         paste(c(seq_phi, density), collapse = "")
   )
-  result = list(seq_phi, density, inla.prior.table)
+  return (  inla.prior.table )
+  }
+  
+  result = list(seq_phi, density)
   return (result)
   
 }
@@ -48,8 +53,9 @@ WCP_1D_AR1_analytic = function(seq_phi,
 #' @return A list including densities on seq_xi and a inla table
 #' @export
 #'
-WCP_1D_GP_analytic = function(seq_xi,
-                              eta){
+WCP_1D_GPtail_analytic = function(seq_xi,
+                              eta,
+                              inla_table = FALSE){
   
   density = numeric()
   for (i in 1:length(seq_xi)){
@@ -59,24 +65,30 @@ WCP_1D_GP_analytic = function(seq_xi,
     }
     density[i] = eta/(1 - xi)^2 * exp( - eta * xi/(1 - xi) )
   }
+  
+  if (inla_table){  
   # inla table
   inla.prior.table = paste0("table: ",
                             paste(c(seq_xi, density), collapse = "")
   )
-  result = list(seq_xi, density, inla.prior.table )
+  return (inla.prior.table)
+  }
+  
+  result = list(seq_xi, density)
   return (result)
 }
 
 #' The 1d analytic density WCP2 prior for tau (1/variance) of Gaussian distribution
 #'
-#' @param seq_xi A vector of values of xi parameter. 
+#' @param seq_tau A vector of values of tau parameter. 
 #' @param eta User specified parameter of the WCP prior.
 #'
 #' @return A list including densities on seq_tau and a inla table
 #' @export
 #'
 WCP_1D_Gaussian_precision_analytic = function(seq_tau,
-                              eta){
+                              eta,
+                              inla_table = FALSE){
 
   density = numeric()
   for (i in 1:length(seq_tau)){
@@ -86,13 +98,45 @@ WCP_1D_Gaussian_precision_analytic = function(seq_tau,
     }
     density[i] = 0.5 * tau^(-3/2) * eta *exp( -eta * tau^(-1/2))
   }
+  if (inla_table){  
   # inla table
   inla.prior.table = paste0("table: ",
                             paste(c(seq_tau, density), collapse = "")
   )
-  result = list(seq_tau, density, inla.prior.table )
+  return (inla.prior.table)
+  }
+  
+  result = list(seq_tau, density )
   return (result)
 }
 
+#' The 1d analytic density WCP2 prior for mean of Gaussian distribution
+#'
+#' @param seq_m A vector of values of mean parameter. 
+#' @param eta User specified parameter of the WCP prior.
+#'
+#' @return A list including densities on seq_m and a inla table
+#' @export
+#'
+WCP_1D_Gaussian_precision_analytic = function(seq_m,
+                                              eta,
+                                              inla_table = FALSE){
+  
+  density = numeric()
+  for (i in 1:length(seq_m)){
+    m = seq_m[i]
+    density[i] = 0.5 * eta * exp( - eta * abs(m) )
+  }
+  if (inla_table){
+    # inla table
+    inla.prior.table = paste0("table: ",
+                              paste(c(seq_m, density), collapse = "")
+    )
+    return (inla.prior.table)
+  }
+  
+  result = list(seq_m, density )
+  return (result)
+}
 
   
