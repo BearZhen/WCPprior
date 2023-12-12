@@ -4,7 +4,7 @@
 \alias{WCP_1D_AR1_analytic}
 \title{The 1d analytic density WCP prior for phi of stationary AR1 process}
 \usage{
-WCP_1D_AR1_analytic(seq_phi, eta, n, sigma)
+WCP_1D_AR1_analytic(seq_phi, eta, n, sigma, inla_table = FALSE)
 }
 \arguments{
 \item{seq_phi}{A vector of values of phi parameter.}
@@ -14,6 +14,8 @@ WCP_1D_AR1_analytic(seq_phi, eta, n, sigma)
 \item{n}{Length of AR1 process.}
 
 \item{sigma}{Standard deviation of the process.}
+
+\item{inla_table}{Should the results be returned as a table to be used in INLA? Default is FALSE.}
 }
 \value{
 A list including densities on seq_phi and a inla table

@@ -19,7 +19,9 @@ my.grad = function(func, x){
 #' @param eta User specified parameter of the WCP prior.
 #' @param cutoff1 Cutoff parameter that decide upper bound of the Wasserstein distance on the right hand side of base_theta.
 #' @param cutoff2 Cutoff parameter that decide upper bound of the Wasserstein distance on the left hand side of base_theta.
-#' @param mesh_width Mesh width.
+#' @param mesh_width Mesh width to be used. If not used, mesh_n will be used.
+#' @param mesh_n Number of mesh nodes to be used. Will not be used if mesh_width is given.
+#' @param inla_table Should the results be returned as a table to be used in INLA? Default is FALSE.
 #' @return A list of density locations and densities evaluated on those locations.
 #' @export
 #'
@@ -34,7 +36,7 @@ WCP_1D_Numerical_Density= function(W_func,
                                    cutoff2 = NULL,
                                    L_included = FALSE,
                                    U_included = FALSE,
-                                   return_for_inla = FALSE){
+                                   inla_table = FALSE){
   
    
   # when the domain of theta is one-sided 
@@ -46,7 +48,7 @@ WCP_1D_Numerical_Density= function(W_func,
       stop("The upper bound of theta should be a finite value!")
     }
     # determine an upper bound for W
-    W_upper_bound = -log(cutoff)/eta
+    W_upper_bound = -log(cutoff1)/eta
     ## binary search
     N = U
     current_W = W_func(N)
@@ -88,7 +90,7 @@ WCP_1D_Numerical_Density= function(W_func,
       stop("The lower bound of theta should be a finite value!")
     }
     # determine an upper bound for W
-    W_upper_bound = -log(cutoff)/eta
+    W_upper_bound = -log(cutoff1)/eta
     ## binary search
     N = L
     current_W = W_func(N)
@@ -128,7 +130,7 @@ WCP_1D_Numerical_Density= function(W_func,
     if (is.null(cutoff2) == 1) {
       stop("User should provide cutoff2!")
     }
-    W_upper_bound_right = -log(cutoff)/eta
+    W_upper_bound_right = -log(cutoff1)/eta
     W_upper_bound_left = -log(cutoff2)/eta
     ## binary search for lower bound of the interval
     N = base_theta
@@ -237,7 +239,7 @@ WCP_1D_Numerical_Density= function(W_func,
   density_discrete = absJ*eta*exp(-eta*W)
   # for INLA
 
-  if(return_for_inla){
+  if(inla_table){
     prior_table = paste0("table: ",
                          paste(c(location, density_discrete), collapse = " "))
     return(prior_table)

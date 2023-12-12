@@ -4,12 +4,14 @@
 \alias{WCP_1D_Gaussian_precision_analytic}
 \title{The 1d analytic density WCP2 prior for tau (1/variance) of Gaussian distribution}
 \usage{
-WCP_1D_Gaussian_precision_analytic(seq_tau, eta)
+WCP_1D_Gaussian_precision_analytic(seq_tau, eta, inla_table = FALSE)
 }
 \arguments{
+\item{seq_tau}{A vector of values of tau parameter.}
+
 \item{eta}{User specified parameter of the WCP prior.}
 
-\item{seq_xi}{A vector of values of xi parameter.}
+\item{inla_table}{Should the results be returned as a table to be used in INLA? Default is FALSE.}
 }
 \value{
 A list including densities on seq_tau and a inla table

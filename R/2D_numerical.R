@@ -92,7 +92,7 @@ WCP_2D_Numerical_Density = function(W_func,
   
 
   if (parallel == TRUE){
-  registerDoParallel(cl <- makeCluster(NumCores))
+  doParallel::registerDoParallel(cl <- parallel::makeCluster(NumCores))
   parallel::clusterEvalQ(cl, library("excursions"))
   parallel::clusterExport(cl, "weights_fine",
                           envir = environment())
@@ -101,7 +101,7 @@ WCP_2D_Numerical_Density = function(W_func,
   parallel::clusterExport(cl, "compute_partial_arc_lengths",
                           envir = environment())
   
-  results <- foreach (W = seq(from = W_lower_bound, to = W_upper_bound, length = lc_multiplier*ceiling(W_upper_bound/(mesh_width^alpha)))) %dopar% {
+  results <- foreach::foreach (W = seq(from = W_lower_bound, to = W_upper_bound, length = lc_multiplier*ceiling(W_upper_bound/(mesh_width^alpha)))) %dopar% {
     levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
                                levels = W)$contour 
     # skip if there is no such level curve
@@ -216,12 +216,12 @@ WCP_2D_Numerical_Density = function(W_func,
     new_loc <- mesh$loc[idx_problem, , drop=FALSE]
     new_W <- W_func( c(new_loc[,1], new_loc[,2])) + jitter
     if (parallel == TRUE){
-    results_additional <- foreach (W = new_W) %dopar% {
+    results_additional <- foreach::foreach (W = new_W) %dopar% {
       #print(W)
-      levelcurve = tricontourmap(mesh_finer, z = weights_fine,
+      levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
                                  levels = W)$contour 
       # skip if there is no such level curve
-      temp = try(coordinates(levelcurve)[[1]][[1]], silent = FALSE)
+      temp = try(sp::coordinates(levelcurve)[[1]][[1]], silent = FALSE)
       if ('try-error' %in% class(temp)){
         return(NULL)
       } else{ # otherwise, check the type pf level curve and update partial and total arc length
@@ -265,10 +265,10 @@ WCP_2D_Numerical_Density = function(W_func,
 
     } else {
       for (W in new_W){
-      levelcurve = tricontourmap(mesh_finer, z = weights_fine,
+      levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
                                  levels = W)$contour 
       # skip if there is no such level curve
-      temp = try(coordinates(levelcurve)[[1]][[1]], silent = FALSE)
+      temp = try(sp::coordinates(levelcurve)[[1]][[1]], silent = FALSE)
       if ('try-error' %in% class(temp)){
         return(NULL)
       } else{ # otherwise, check the type pf level curve and update partial and total arc length
@@ -309,10 +309,10 @@ WCP_2D_Numerical_Density = function(W_func,
       }
     }
     
-    PD_util_P = fm_basis(mesh, density_location, derivatives = TRUE)
+    PD_util_P = fmesher::fm_basis(mesh, density_location, derivatives = TRUE)
     A = PD_util_P$A
     idx_problem <- which(colSums(A)==0)
-    jitter <- abs(rnorm(1, mean = mesh_width/10, sd = mesh_width/10))
+    jitter <- abs(stats::rnorm(1, mean = mesh_width/10, sd = mesh_width/10))
     print("Adding more levels")
   }
   
@@ -327,7 +327,7 @@ WCP_2D_Numerical_Density = function(W_func,
   P_PD_y = as.vector(P_PD_y)
   
   # compute partial derivatives of the Wasserstein distance on level curve points
-  PD_util_W = fm_basis(mesh, density_location, derivatives = TRUE)
+  PD_util_W = fmesher::fm_basis(mesh, density_location, derivatives = TRUE)
   W_PD_x = PD_util_W$dx %*% matrix(weights,ncol = 1)
   W_PD_x = as.vector(W_PD_x)
   W_PD_y = PD_util_W$dy %*% matrix(weights,ncol = 1)
@@ -343,7 +343,7 @@ WCP_2D_Numerical_Density = function(W_func,
   }
   # the approximated density on level curve points
   approx_WCP_density = eta * approx_detJ_abs * exp(-eta * W_distance)/tarc
-  mass_lump_C = fm_fem(mesh, order = 1)$c0
+  mass_lump_C = fmesher::fm_fem(mesh, order = 1)$c0
   
   result = list(density_location, approx_WCP_density, mass_lump_C, A_new, W_distance, parc, tarc, approx_detJ_abs)
   return(result)

@@ -1,16 +1,19 @@
 Package: WCPprior
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
+Title: Wasserstein complexity penalization priors
 Version: 1.0
 Date: 2023-06-01
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one or more full sentences.
+Authors@R: c(
+    person("Zhen", "Xiong", email = "zhen.xiong@kaust.edu.sa", role = c("cre","aut")),
+    person("David", "Bolin", email = "davidbolin@gmail.com", role = "aut"),
+    person("Alexandre", "Simas", email = "alexandre.impa@gmail.com", role = "aut"))
+Maintainer: Zhen Xiong <zhen.xiong@kaust.edu.sa>
+Description: Functions to obtain numerical approximation of Wasserstein complexity penalization (WCP) priors. The package also contains several analytical WCP priors as well as implementations for STAN and INLA.
 License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.10)
+Imports: Rcpp (>= 1.0.10), Matrix, foreach
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0), fmesher, sp, excursions, doParallel
 Config/testthat/edition: 3

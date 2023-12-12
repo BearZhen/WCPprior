@@ -5,42 +5,36 @@
 \title{The 2d numerical approximation of WCP prior}
 \usage{
 WCP_2D_Numerical_Density(
-  boundary_path,
   W_func,
-  mesh_width,
-  alpha = 1,
-  W_lower_bound,
-  W_upper_bound,
   eta,
-  L2,
-  U2,
-  level_curve_type,
+  mesh_width = NULL,
+  alpha = 1,
+  tau = mesh_width/1000,
+  cutoff = 0.01,
+  region = list(type = "conic", lower_angle = 0, upper_angle = pi, base_theta = c(0, 0)),
   lc_multiplier = 20,
-  NumCores
+  parallel = FALSE,
+  NumCores = parallel::detectCores() - 1
 )
 }
 \arguments{
-\item{boundary_path}{A sequence of points that represent boundary of computational domain.}
-
 \item{W_func}{A function that returns the Wasserstein distance given theta1 and theta2.}
+
+\item{eta}{User specified parameter of the WCP prior.}
 
 \item{mesh_width}{Mesh width.}
 
 \item{alpha}{Power of mesh width for a finer mesh.}
 
-\item{W_lower_bound}{The lower bound of the Wasserstein distance.}
+\item{tau}{tau parameter, indicating how much bounded away from boundary.}
 
-\item{W_upper_bound}{The upper bound of the Wasserstein distance.}
+\item{cutoff}{Cutoff parameter indicating probability tail mass for the Wasserstein distance.}
 
-\item{eta}{User specified parameter of the WCP prior.}
-
-\item{L2}{Lower bound of theta 2.}
-
-\item{U2}{Upper bound of theta 2.}
-
-\item{level_curve_type}{Type of level curve, the value should be either LL or LU}
+\item{region}{A list that specify region information.}
 
 \item{lc_multiplier}{Multiplier determines number of level curves}
+
+\item{parallel}{A logic value that indicating whether the user wants to run the function with multiple cpu.}
 
 \item{NumCores}{Number of cores to run the function.}
 }

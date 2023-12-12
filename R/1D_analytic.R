@@ -4,6 +4,7 @@
 #' @param eta User specified parameter of the WCP prior.
 #' @param n Length of AR1 process. 
 #' @param sigma Standard deviation of the process.
+#' @param inla_table Should the results be returned as a table to be used in INLA? Default is FALSE.
 #'
 #' @return A list including densities on seq_phi and a inla table
 #' @export
@@ -12,7 +13,7 @@ WCP_1D_AR1_analytic = function(seq_phi,
                                eta,
                                n,
                                sigma,
-                               inla_table){
+                               inla_table = FALSE){
   if (n < 1 ) {
     stop("n should be no less than 1!")
   }
@@ -49,6 +50,7 @@ WCP_1D_AR1_analytic = function(seq_phi,
 #'
 #' @param seq_xi A vector of values of xi parameter. 
 #' @param eta User specified parameter of the WCP prior.
+#' @param inla_table Should the results be returned as a table to be used in INLA? Default is FALSE.
 #'
 #' @return A list including densities on seq_xi and a inla table
 #' @export
@@ -82,11 +84,13 @@ WCP_1D_GPtail_analytic = function(seq_xi,
 #'
 #' @param seq_tau A vector of values of tau parameter. 
 #' @param eta User specified parameter of the WCP prior.
+#' @param inla_table Should the results be returned as a table to be used in INLA? Default is FALSE.
 #'
 #' @return A list including densities on seq_tau and a inla table
 #' @export
 #'
-WCP_1D_Gaussian_precision_analytic = function(seq_tau,
+WCP_1D_Gaussian_precision_analytic = function(
+                              seq_tau,
                               eta,
                               inla_table = FALSE){
 
@@ -114,11 +118,12 @@ WCP_1D_Gaussian_precision_analytic = function(seq_tau,
 #'
 #' @param seq_m A vector of values of mean parameter. 
 #' @param eta User specified parameter of the WCP prior.
+#' @param inla_table Should the results be returned as a table to be used in INLA? Default is FALSE.
 #'
 #' @return A list including densities on seq_m and a inla table
 #' @export
 #'
-WCP_1D_Gaussian_precision_analytic = function(seq_m,
+WCP_1D_Gaussian_mean_analytic = function(seq_m,
                                               eta,
                                               inla_table = FALSE){
   

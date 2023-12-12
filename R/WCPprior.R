@@ -8,4 +8,5 @@
 #' @useDynLib WCPprior, .registration = TRUE
 #' 
 #' @import Matrix
+#' @importFrom foreach `%dopar%`
 NULL
