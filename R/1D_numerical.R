@@ -1,11 +1,10 @@
 
 # function to compute gradient
+#' @noRd
+#' 
 my.grad = function(func, x){
   eps = 1e-6
   return ((func(x + eps)-func(x))/eps)
-  
-  #require(numDeriv)
-  #return (grad(func, x))
 }
 
 #' The 1d numerical density WCP prior 

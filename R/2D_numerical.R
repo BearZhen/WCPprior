@@ -6,7 +6,7 @@
 #' @param mesh_width Mesh width.
 #' @param alpha Power of mesh width for a finer mesh.
 #' @param tau tau parameter, indicating how much bounded away from boundary.
-#' @param region A list that specify region information.
+#' @param region A list that specify region information. For example, for strip regions (regions of the type IxJ, where I = (a,b) and J = (c,d) are intervals, with one of them being unbounded), one can set `region = list(type = "strip", base_theta = c(a,c), corners = c(a,b,c,d))`, where some of the values `a`,`b`,`c` or `d` can be `-Inf` or `Inf`. If the type is conic, the list must be set, for example, as list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)), where `lower_angle` and `upper_angle` contains the smaller and larger angles that determine the cone.
 #' @param eta User specified parameter of the WCP prior.
 #' @param parallel A logic value that indicating whether the user wants to run the function with multiple cpu.
 #' @param lc_multiplier Multiplier determines number of level curves
@@ -17,25 +17,15 @@
 #'
 WCP_2D_Numerical_Density = function(W_func,
                           eta,
-                          mesh_width = NULL, # arclength_boundary_mesh_region * 0.01
-                          #mesh_n = NULL,
-                          #boundary_n = sqrt(mesh_n), #
+                          mesh_width, 
                           alpha = 1,
                           tau = mesh_width/1000,
                           cutoff = 0.01, 
-                          #W_lower_bound = , #the same from the boundary function
-                          #W_upper_bound = , #the same from the boundary function
-                          # L2, U2, extract this from the boundary
-                          region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)), # region = list(type = "strip", corners = c(a,b,c,d))
-                          #level_curve_type = "detect",
+                          region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
                           lc_multiplier = 20,
                           parallel = FALSE,
                           NumCores = parallel::detectCores()-1) {
   
-
-
-
-
   ######################################## mesh generation ######################################
   ## mesh for interpolating the Wasserstein distance, partial derivatives of the Wasserstein distance
   print('begin')
