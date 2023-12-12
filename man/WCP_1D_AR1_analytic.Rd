@@ -4,10 +4,10 @@
 \alias{WCP_1D_AR1_analytic}
 \title{The 1d analytic density WCP prior for phi of stationary AR1 process}
 \usage{
-WCP_1D_AR1_analytic(phi, eta, n, sigma)
+WCP_1D_AR1_analytic(seq_phi, eta, n, sigma)
 }
 \arguments{
-\item{phi}{phi parameter.}
+\item{seq_phi}{A vector of values of phi parameter.}
 
 \item{eta}{User specified parameter of the WCP prior.}
 
@@ -16,7 +16,7 @@ WCP_1D_AR1_analytic(phi, eta, n, sigma)
 \item{sigma}{Standard deviation of the process.}
 }
 \value{
-A value of density evaluated at c(mean, std).
+A list including densities on seq_phi and a inla table
 }
 \description{
 The 1d analytic density WCP prior for phi of stationary AR1 process

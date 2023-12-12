@@ -23,16 +23,18 @@ my.grad = function(func, x){
 #' @return A list of density locations and densities evaluated on those locations.
 #' @export
 #'
-WCP_1D_Numerical_Density= function(base_theta,
-                                   L, 
-                                   L_included = TRUE,
-                                   U,
-                                   U_included = FALSE,
-                                   W_func,
+WCP_1D_Numerical_Density= function(W_func,
                                    eta,
-                                   cutoff1,
+                                   base_theta,
+                                   L, 
+                                   U,
+                                   mesh_width = NULL,
+                                   mesh_n = 100,
+                                   cutoff1 = 0.01,
                                    cutoff2 = NULL,
-                                   mesh_width){
+                                   L_included = FALSE,
+                                   U_included = FALSE,
+                                   return_for_inla = FALSE){
   
    
   # when the domain of theta is one-sided 
@@ -234,11 +236,14 @@ WCP_1D_Numerical_Density= function(base_theta,
   # return the value of density
   density_discrete = absJ*eta*exp(-eta*W)
   # for INLA
-  prior_table = paste0("table: ",
-                        paste(c(location, density_discrete), collapse = " ")
-  )
-  result = list(location, density_discrete, prior_table)
-  return (result)
+
+  if(return_for_inla){
+    prior_table = paste0("table: ",
+                         paste(c(location, density_discrete), collapse = " "))
+    return(prior_table)
+  }
+  
+  return(cbind(location, density_discrete))
 }
 
 

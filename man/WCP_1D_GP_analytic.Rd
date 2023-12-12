@@ -4,15 +4,15 @@
 \alias{WCP_1D_GP_analytic}
 \title{The 1d analytic density WCP prior for xi of generalized Pareto distribution}
 \usage{
-WCP_1D_GP_analytic(xi, eta)
+WCP_1D_GP_analytic(seq_xi, eta)
 }
 \arguments{
-\item{xi}{Xi parameter.}
+\item{seq_xi}{A vector of values of xi parameter.}
 
 \item{eta}{User specified parameter of the WCP prior.}
 }
 \value{
-A value of density evaluated at c(sigma, xi).
+A list including densities on seq_xi and a inla table
 }
 \description{
 The 1d analytic density WCP prior for xi of generalized Pareto distribution

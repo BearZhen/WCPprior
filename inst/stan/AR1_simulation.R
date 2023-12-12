@@ -1,7 +1,6 @@
-
-
 rm(list = ls())
 library(rstan)
+
 WCP_coverage_count_phi = 0
 
 PC_coverage_count_phi = 0
@@ -10,8 +9,9 @@ WCP_coverage_length_phi = c()
 
 WCP_function_coverage_length_phi = c()
 
-for (k in 1:100){
-  print(k)
+#for (k in 1:100){
+k <- 1
+print(k)
 
 # simulate AR1 process
 # n is the length of the process
@@ -27,7 +27,9 @@ data <- list(N = 100L,
              y = sim_data
 )
 
-fit_WCP_function <- stan(file = 'AR1_WCP_function_version.stan', data = data, iter = 1000)
+fit_WCP_function <- stan(file = 'AR1_WCP_function_version.stan', data = data, iter = 1000) 
+
+
 WCP_function_post_phi <- extract(fit_WCP_function, pars = "phi")
 WCP_function_hdi_phi = bayestestR::hdi(WCP_function_post_phi$phi, ci = 0.9)
 if(phi >= WCP_function_hdi_phi$CI_low && phi <= WCP_function_hdi_phi$CI_high ){
@@ -43,7 +45,7 @@ if(phi>=WCP_hdi_phi$CI_low && phi<=WCP_hdi_phi$CI_high ){
   WCP_coverage_length_phi = c(WCP_coverage_length_phi, WCP_hdi_phi$CI_high - WCP_hdi_phi$CI_low)
 }
 
-}
+# }
 
 WCP_average_cl_phi = mean(WCP_coverage_length_phi)
 WCP_function_average_cl_phi = mean(WCP_function_coverage_length_phi)

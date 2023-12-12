@@ -1,57 +1,88 @@
 
 #' The 2d numerical approximation of WCP prior
 #'
-#' @param boundary_path A sequence of points that represent boundary of computational domain.
+#' @param cutoff Cutoff parameter indicating probability tail mass for the Wasserstein distance.
 #' @param W_func A function that returns the Wasserstein distance given theta1 and theta2. 
 #' @param mesh_width Mesh width.
 #' @param alpha Power of mesh width for a finer mesh.
-#' @param W_lower_bound The lower bound of the Wasserstein distance.
-#' @param W_upper_bound The upper bound of the Wasserstein distance.
+#' @param tau tau parameter, indicating how much bounded away from boundary.
+#' @param region A list that specify region information.
 #' @param eta User specified parameter of the WCP prior.
-#' @param L2 Lower bound of theta 2.
-#' @param U2 Upper bound of theta 2.
-#' @param level_curve_type Type of level curve, the value should be either LL or LU
+#' @param parallel A logic value that indicating whether the user wants to run the function with multiple cpu.
 #' @param lc_multiplier Multiplier determines number of level curves
 #' @param NumCores Number of cores to run the function.
 #'
 #' @return A list of density locations, densities evaluated on those locations and other utilities that can help access accuracy.
 #' @export
 #'
-WCP_2D_Numerical_Density = function(boundary_path,
-                          W_func,
-                          mesh_width,
-                          alpha = 1,
-                          W_lower_bound,
-                          W_upper_bound,
+WCP_2D_Numerical_Density = function(W_func,
                           eta,
-                          L2, U2,
-                          level_curve_type,
+                          mesh_width = NULL, # arclength_boundary_mesh_region * 0.01
+                          #mesh_n = NULL,
+                          #boundary_n = sqrt(mesh_n), #
+                          alpha = 1,
+                          tau = mesh_width/1000,
+                          cutoff = 0.01, 
+                          #W_lower_bound = , #the same from the boundary function
+                          #W_upper_bound = , #the same from the boundary function
+                          # L2, U2, extract this from the boundary
+                          region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)), # region = list(type = "strip", corners = c(a,b,c,d))
+                          #level_curve_type = "detect",
                           lc_multiplier = 20,
-                          NumCores){
+                          parallel = FALSE,
+                          NumCores = parallel::detectCores()-1) {
   
+
+
+
+
   ######################################## mesh generation ######################################
   ## mesh for interpolating the Wasserstein distance, partial derivatives of the Wasserstein distance
-  mesh = fm_mesh_2d(boundary = fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width)
-  plot(mesh)
+  print('begin')
+  if (region$type == 'conic'){
+    # boundary path
+    print("conic")
+    boundary_path = region_conic(theta_0 = region$base_theta, phi_l = region$lower_angle, phi_r = region$upper_angle, eta = eta, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func)
+    level_curve_type = 'LL'
+    # lower bound of the second coordinate
+    L2 = 0
+  } else if (region$type == 'strip'){
+    print('strip')
+    boundary_path = region_strip(theta_0 = region$base_theta, lower_bnd = region$lower_boundary, upper_bnd = region$upper_boundary, eta = eta, direction = region$direction, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func, tau = tau)
+    level_curve_type = 'LU'
+    L2 = region$lower_boundary
+    U2 = region$upper_boundary
+  } else {
+    stop("Wronly specifying the region or the type of region is not yet developed. Please contact our development team if you need.")
+  }
+  
+  mesh = fmesher::fm_mesh_2d(boundary = fmesher::fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width)
   # weights on mesh
   weights = numeric()
   for (i in 1:dim(mesh$loc)[1]){
-    weights[i] = W_func(as.numeric(mesh$loc[i,1]), as.numeric(mesh$loc[i,2]))
+    weights[i] = W_func(c(as.numeric(mesh$loc[i,1]), as.numeric(mesh$loc[i,2])))
   }
+  
+
   # the default weights_fine and mesh_finer since the default alpha is 1.
   mesh_finer = mesh
   weights_fine = weights
   
   ## mesh for computing partial arc length values if alpha is not 1. Weights of this mesh will also be updated.
   if (alpha != 1){
-    mesh_finer = fm_mesh_2d(boundary = fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width^alpha)
+    mesh_finer = fmesher::fm_mesh_2d(boundary = fmesher::fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width^alpha)
     weights_fine = numeric()
     for (i in 1:dim(mesh_finer$loc)[1]){
-      weights_fine[i] = W_func(as.numeric(mesh_finer$loc[i,1]), as.numeric(mesh_finer$loc[i,2]))
+      weights_fine[i] = W_func( c(as.numeric(mesh_finer$loc[i,1]), as.numeric(mesh_finer$loc[i,2])) ) 
     }
   }
+
   
   ############# obtain level curves and filter the non-complete ones ###########################
+  # get lower and upper bound of the Wasserstein distance
+  W_lower_bound = min(weights_fine)
+  W_upper_bound = max(weights_fine)
+
   # a vector containing partial arc length value on each discrete points representing level curves
   parc = numeric()
   # a vector containing total arc length value on each discrete point representing level curves
@@ -59,6 +90,8 @@ WCP_2D_Numerical_Density = function(boundary_path,
   # coordinates of discrete points representing level curves, these are the locations where we will evaluate prior density.
   density_location = numeric()
   
+
+  if (parallel == TRUE){
   registerDoParallel(cl <- makeCluster(NumCores))
   parallel::clusterEvalQ(cl, library("excursions"))
   parallel::clusterExport(cl, "weights_fine",
@@ -69,16 +102,16 @@ WCP_2D_Numerical_Density = function(boundary_path,
                           envir = environment())
   
   results <- foreach (W = seq(from = W_lower_bound, to = W_upper_bound, length = lc_multiplier*ceiling(W_upper_bound/(mesh_width^alpha)))) %dopar% {
-    levelcurve = tricontourmap(mesh_finer, z = weights_fine,
+    levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
                                levels = W)$contour 
     # skip if there is no such level curve
-    temp = try(coordinates(levelcurve)[[1]][[1]], silent = FALSE)
+    temp = try(sp::coordinates(levelcurve)[[1]][[1]], silent = FALSE)
     if ('try-error' %in% class(temp)){
       return(NULL)
     } else{ # otherwise, check the type pf level curve and update partial and total arc length
       
       # obtain the coordinates of all the discrete points of the level curve
-      line_coord = coordinates(levelcurve)[[1]][[1]]
+      line_coord = sp::coordinates(levelcurve)[[1]][[1]]
       
       # if the second coordinate of level curves starts from L2 and ends at L2, like the Gaussian case
       if (level_curve_type == 'LL'){
@@ -115,21 +148,76 @@ WCP_2D_Numerical_Density = function(boundary_path,
   density_location <- complete_results[,1:2]
   parc <- complete_results[,3]
   tarc <- complete_results[,4]
-  
+  } else {
+    
+    for (W in seq(from = W_lower_bound, to = W_upper_bound, length = lc_multiplier*ceiling(W_upper_bound/(mesh_width^alpha)))){
+    levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
+                               levels = W)$contour 
+    # skip if there is no such level curve
+    temp = try(sp::coordinates(levelcurve)[[1]][[1]], silent = FALSE)
+    if ('try-error' %in% class(temp)){
+      return(NULL)
+    } else{ # otherwise, check the type pf level curve and update partial and total arc length
+      
+      # obtain the coordinates of all the discrete points of the level curve
+      line_coord = sp::coordinates(levelcurve)[[1]][[1]]
+      
+      # if the second coordinate of level curves starts from L2 and ends at L2, like the Gaussian case
+      if (level_curve_type == 'LL'){
+        # drop the non-complete curve
+        if (line_coord[1,2] - L2 > 2*mesh_width^alpha | line_coord[length(line_coord[,1]),2] - L2 > 2*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update density location
+          density_location = rbind(density_location, line_coord)
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
+          parc = c(parc, levelcurve_parc)
+          # update total arc length, compensated by the lift
+          tarc = c(tarc, rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2]))
+        }
+        
+      } else { # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
+        
+        if (line_coord[1,2] - L2 > 5*mesh_width^alpha | U2 - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update density location
+          density_location = rbind(density_location, line_coord)
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
+          parc = c(parc, levelcurve_parc)
+          # update total arc length, compensated by the lift
+          tarc = c(tarc, rep(max(levelcurve_parc), times = length(levelcurve_parc))+ U2 - max(boundary_path[,2]) )
+        }
+        
+      }
+      
+    }
+    }
+
+  }
+
+
+
+
+
+
   ## check if every triangular element contains at least one point from level curves
-  PD_util_P = fm_basis(mesh, density_location, derivatives = TRUE)
+  PD_util_P = fmesher::fm_basis(mesh, density_location, derivatives = TRUE)
   A = PD_util_P$A
   # find the mesh nodes whose element does not contain any level curve points
-  idx_problem <- which(colSums(A)==0)
+  idx_problem <- which(Matrix::colSums(A)==0)
   print("length")
   print(length(idx_problem))
   jitter = 0
   while(length(idx_problem)>0){
-    print("having holes")
+    #print("having holes")
     new_loc <- mesh$loc[idx_problem, , drop=FALSE]
-    new_W <- W_func(new_loc[,1], new_loc[,2]) + jitter
+    new_W <- W_func( c(new_loc[,1], new_loc[,2])) + jitter
+    if (parallel == TRUE){
     results_additional <- foreach (W = new_W) %dopar% {
-      print(W)
+      #print(W)
       levelcurve = tricontourmap(mesh_finer, z = weights_fine,
                                  levels = W)$contour 
       # skip if there is no such level curve
@@ -139,7 +227,7 @@ WCP_2D_Numerical_Density = function(boundary_path,
       } else{ # otherwise, check the type pf level curve and update partial and total arc length
         
         # obtain the coordinates of all the discrete points of the level curve
-        line_coord = coordinates(levelcurve)[[1]][[1]]
+        line_coord = sp::coordinates(levelcurve)[[1]][[1]]
         
         # if the second coordinate of level curves starts from L2 and ends at L2, like the Gaussian case
         if (level_curve_type == 'LL'){
@@ -174,6 +262,53 @@ WCP_2D_Numerical_Density = function(boundary_path,
     density_location <- rbind(density_location, complete_results[,1:2])
     parc <- c(parc, complete_results[,3])
     tarc <- c(tarc,complete_results[,4])
+
+    } else {
+      for (W in new_W){
+      levelcurve = tricontourmap(mesh_finer, z = weights_fine,
+                                 levels = W)$contour 
+      # skip if there is no such level curve
+      temp = try(coordinates(levelcurve)[[1]][[1]], silent = FALSE)
+      if ('try-error' %in% class(temp)){
+        return(NULL)
+      } else{ # otherwise, check the type pf level curve and update partial and total arc length
+        
+        # obtain the coordinates of all the discrete points of the level curve
+        line_coord = sp::coordinates(levelcurve)[[1]][[1]]
+        
+        # if the second coordinate of level curves starts from L2 and ends at L2, like the Gaussian case
+        if (level_curve_type == 'LL'){
+          # drop the non-complete curve
+          if (line_coord[1,2] - L2 > 2*mesh_width^alpha | line_coord[length(line_coord[,1]),2] - L2 > 2*mesh_width^alpha){
+            return(NULL)
+          } else{
+          # update density location
+          density_location = rbind(density_location, line_coord)
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
+          parc = c(parc, levelcurve_parc)
+          # update total arc length, compensated by the lift
+          tarc = c(tarc, rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2]))
+          }
+          
+        } else { # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
+          if (line_coord[1,2] - L2 > 10*(mesh_width^alpha) | U2 - line_coord[length(line_coord[,1]),2]  > 10*(mesh_width^alpha) ){
+            return(NULL)
+          } else{
+          # update density location
+          density_location = rbind(density_location, line_coord)
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
+          parc = c(parc, levelcurve_parc)
+          # update total arc length, compensated by the lift
+          tarc = c(tarc, rep(max(levelcurve_parc), times = length(levelcurve_parc))+ U2 - max(boundary_path[,2]) )
+          }
+        }
+        
+      }
+      }
+    }
+    
     PD_util_P = fm_basis(mesh, density_location, derivatives = TRUE)
     A = PD_util_P$A
     idx_problem <- which(colSums(A)==0)
@@ -204,7 +339,7 @@ WCP_2D_Numerical_Density = function(boundary_path,
   # compute the Wasserstein distance on level curve points
   W_distance = numeric()
   for (i in 1:dim(density_location)[1]){
-    W_distance[i] = W_func(as.numeric(density_location[i,1]), as.numeric(density_location[i,2]))
+    W_distance[i] = W_func( c(as.numeric(density_location[i,1]), as.numeric(density_location[i,2])))
   }
   # the approximated density on level curve points
   approx_WCP_density = eta * approx_detJ_abs * exp(-eta * W_distance)/tarc

@@ -1,4 +1,4 @@
-functions{
+functions {
 #include /include/WCP_analytic.stan
 }
 // The input data is a vector 'y' of length 'N'.

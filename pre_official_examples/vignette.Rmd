@@ -11,6 +11,23 @@ library(WCPprior)
 ```
 
 
+An example with numerical approximation of 2d WCP1 prior of $\sigma$ and $\xi$ of generalized Pareto distribution.
+
+computational domain
+
+boundary construction
+
+using the WCP 2d function
+
+shows the TVD error
+
+An example with numerical approximation of 1d WCP2 prior of $\xi = 1/\nu$, the reciprocal of degree of freedom parameter, of the t-distribution.
+
+computational domain
+
+using the WCP 1d function
+
+Examples with 1D and 2D analytic function.
 
 
 
@@ -30,11 +47,4 @@ library(WCPprior)
 
 
 
-
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 

@@ -6,4 +6,6 @@
 #' @name WCPprior
 #' @importFrom Rcpp evalCpp
 #' @useDynLib WCPprior, .registration = TRUE
+#' 
+#' @import Matrix
 NULL

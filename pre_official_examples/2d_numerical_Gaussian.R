@@ -7,41 +7,50 @@ library(viridis)
 library(pracma)
 library(fmesher)
 
-W_func = function(mean, sd){
-  true_W = sqrt(mean^2 + sd^2)
-  return(true_W)
-}
+W_func <- function(x){sqrt(x[1]^2+x[2]^2)}
 
 cutoff = 0.01
 mesh_width = 0.5
 tau = mesh_width/1000
 alpha = 1
 eta = 1
-W_upper_bound = -log(cutoff/2)/eta
-W_lower_bound = -log(1-(cutoff+tau)/2)/eta
+# W_upper_bound = -log(cutoff/2)/eta
+# W_lower_bound = -log(1-(cutoff+tau)/2)/eta
 # lower and upper bound of theta1 and theta2
-L1 = -Inf
-U1 = Inf
-L2 = 0
-U2 = Inf
-boundary_path = analytical_boundary_Gaussian(cutoff_out = cutoff/2,
-                                             cutoff_inner = cutoff/2 + tau,
-                                             eta = eta,
-                                             lift = tau,
-                                             arc_width = mesh_width^alpha)
-boundary_path = matrix(boundary_path, ncol = 2)
+# L1 = -Inf
+# U1 = Inf
+# L2 = 0
+# U2 = Inf
+# boundary_path = analytical_boundary_Gaussian(cutoff_out = cutoff/2,
+#                                              cutoff_inner = cutoff/2 + tau,
+#                                              eta = eta,
+#                                              lift = tau,
+#                                              arc_width = mesh_width^alpha)
+# boundary_path = matrix(boundary_path, ncol = 2)
 
-result = WCP_2D_Numerical_Density(boundary_path = boundary_path,
-                        W_func = W_func,
-                        mesh_width = 0.4,
-                        alpha = 1,
-                        W_lower_bound = W_lower_bound,
-                        W_upper_bound = W_upper_bound,
-                        eta = 1,
-                        L2 = L2, U2 = U2,
-                        level_curve_type = 'LL',
-                        lc_multiplier = 20,
-                        NumCores = 3)
+# result = WCP_2D_Numerical_Density(boundary_path = boundary_path,
+#                         W_func = W_func,
+#                         mesh_width = 0.4,
+#                         alpha = 1,
+#                         W_lower_bound = W_lower_bound,
+#                         W_upper_bound = W_upper_bound,
+#                         eta = 1,
+#                         L2 = L2, U2 = U2,
+#                         level_curve_type = 'LL',
+#                         lc_multiplier = 20,
+#                         NumCores = 3)
+
+result = WCP_2D_Numerical_Density(W_func,
+                          eta = 1,
+                          mesh_width = 0.5, 
+                          alpha = 1,
+                          tau = mesh_width/1000,
+                          cutoff = 0.01, 
+                          region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
+                          lc_multiplier = 20,
+                          parallel = TRUE,
+                          NumCores = 3)
+
 density_location = result[[1]]
 approx_WCP_density = result[[2]]
 mass_lump_C = result[[3]]

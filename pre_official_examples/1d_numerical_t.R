@@ -1,7 +1,7 @@
 library(ggplot2)
 library(fGarch)
 
-W2distanceGt = function(xi){
+WpdistanceGt = function(xi){
   # xi is 1/nu where nu is dof of t-distribution
   integrand = function(p,...){
     abs(qstd(p,...) - qnorm(p))^2
@@ -10,16 +10,16 @@ W2distanceGt = function(xi){
   return (integral^(1/2))
 }
 
-Xi = seq(from = 0.01,to = 0.49,by = 0.01)
+Xi = seq(from = 0.001,to = 0.499,by = 0.001)
 Wpdistance = c()
 xi = c()
 for (i in 1:length(Xi)){
-  temp = try(WpdistanceGt(Xi[i], order = 2), silent = FALSE)
+  temp = try(WpdistanceGt(Xi[i]), silent = FALSE)
   if ('try-error' %in% class(temp)){
     print(Xi[i])
     next
   }
-  Wpdistance = c(Wpdistance, WpdistanceGt(Xi[i], order = 2) )
+  Wpdistance = c(Wpdistance, WpdistanceGt(Xi[i]) )
   xi = c(xi, Xi[i])
 }
 
@@ -40,4 +40,4 @@ result = WCP_1D_Numerical_Density(base_theta = 0,
                                    cutoff2 = NULL,
                                    mesh_width = 0.001)
 
-plot(result[[1]], result[[2]])
+plot(result[[1]], result[[2]],type="l")

@@ -1762,18 +1762,20 @@ construct 1D, 2D WCP prior.</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the
-toolbar or by pressing <em>Cmd+Option+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and
-output will be saved alongside it (click the <em>Preview</em> button or
-press <em>Cmd+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the
-editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not
-run any R code chunks. Instead, the output of the chunk when it was last
-run in the editor is displayed.</p>
+<p>An example with numerical approximation of 2d WCP1 prior of <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\xi\)</span> of generalized Pareto
+distribution.</p>
+<p>computational domain</p>
+<p>boundary construction</p>
+<p>using the WCP 2d function</p>
+<p>shows the TVD error</p>
+<p>An example with numerical approximation of 1d WCP2 prior of <span class="math inline">\(\xi = 1/\nu\)</span>, the reciprocal of degree of
+freedom parameter, of the t-distribution.</p>
+<p>computational domain</p>
+<p>using the WCP 1d function</p>
+<p>Examples with 1D and 2D analytic function.</p>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyB2aWduZXR0ZSwgd2Ugd2lsbCBzaG93IGhvdyB0byB1c2UgdGhlIFdDUHByaW9yIHBhY2thZ2UgdG8gY29uc3RydWN0IDFELCAyRCBXQ1AgcHJpb3IuCgpGaXJzdCwgd2UgaW1wb3J0IHRoZSBsaWJyYXJ5LgpgYGB7cn0KbGlicmFyeShXQ1BwcmlvcikKYGBgCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKQWRkIGEgbmV3IGNodW5rIGJ5IGNsaWNraW5nIHRoZSAqSW5zZXJ0IENodW5rKiBidXR0b24gb24gdGhlIHRvb2xiYXIgb3IgYnkgcHJlc3NpbmcgKkNtZCtPcHRpb24rSSouCgpXaGVuIHlvdSBzYXZlIHRoZSBub3RlYm9vaywgYW4gSFRNTCBmaWxlIGNvbnRhaW5pbmcgdGhlIGNvZGUgYW5kIG91dHB1dCB3aWxsIGJlIHNhdmVkIGFsb25nc2lkZSBpdCAoY2xpY2sgdGhlICpQcmV2aWV3KiBidXR0b24gb3IgcHJlc3MgKkNtZCtTaGlmdCtLKiB0byBwcmV2aWV3IHRoZSBIVE1MIGZpbGUpLiAKClRoZSBwcmV2aWV3IHNob3dzIHlvdSBhIHJlbmRlcmVkIEhUTUwgY29weSBvZiB0aGUgY29udGVudHMgb2YgdGhlIGVkaXRvci4gQ29uc2VxdWVudGx5LCB1bmxpa2UgKktuaXQqLCAqUHJldmlldyogZG9lcyBub3QgcnVuIGFueSBSIGNvZGUgY2h1bmtzLiBJbnN0ZWFkLCB0aGUgb3V0cHV0IG9mIHRoZSBjaHVuayB3aGVuIGl0IHdhcyBsYXN0IHJ1biBpbiB0aGUgZWRpdG9yIGlzIGRpc3BsYXllZC4KCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyB2aWduZXR0ZSwgd2Ugd2lsbCBzaG93IGhvdyB0byB1c2UgdGhlIFdDUHByaW9yIHBhY2thZ2UgdG8gY29uc3RydWN0IDFELCAyRCBXQ1AgcHJpb3IuCgpGaXJzdCwgd2UgaW1wb3J0IHRoZSBsaWJyYXJ5LgpgYGB7cn0KbGlicmFyeShXQ1BwcmlvcikKYGBgCgoKQW4gZXhhbXBsZSB3aXRoIG51bWVyaWNhbCBhcHByb3hpbWF0aW9uIG9mIDJkIFdDUDEgcHJpb3Igb2YgJFxzaWdtYSQgYW5kICRceGkkIG9mIGdlbmVyYWxpemVkIFBhcmV0byBkaXN0cmlidXRpb24uCgpjb21wdXRhdGlvbmFsIGRvbWFpbgoKYm91bmRhcnkgY29uc3RydWN0aW9uCgp1c2luZyB0aGUgV0NQIDJkIGZ1bmN0aW9uCgpzaG93cyB0aGUgVFZEIGVycm9yCgpBbiBleGFtcGxlIHdpdGggbnVtZXJpY2FsIGFwcHJveGltYXRpb24gb2YgMWQgV0NQMiBwcmlvciBvZiAkXHhpID0gMS9cbnUkLCB0aGUgcmVjaXByb2NhbCBvZiBkZWdyZWUgb2YgZnJlZWRvbSBwYXJhbWV0ZXIsIG9mIHRoZSB0LWRpc3RyaWJ1dGlvbi4KCmNvbXB1dGF0aW9uYWwgZG9tYWluCgp1c2luZyB0aGUgV0NQIDFkIGZ1bmN0aW9uCgpFeGFtcGxlcyB3aXRoIDFEIGFuZCAyRCBhbmFseXRpYyBmdW5jdGlvbi4KCgoKCgoKCgoKCgoKCgoKCgoKCgo=</div>
 
 
 
