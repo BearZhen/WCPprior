@@ -42,11 +42,11 @@ eta = 20
 
 result = WCP_2D_Numerical_Density(W_GP,
                                   eta = 20,
-                                  mesh_width = 0.04, 
+                                  mesh_width = 0.05, 
                                   alpha = 1,
                                   tau = 0.001,
                                   cutoff = 0.01, 
-                                  region = list(type = 'strip', lower_boundary = 0, upper_boundary = 1, direction = 'positive', base_theta = c(0,0) ),
+                                  region = list(type = 'strip', corner = c(0,Inf,0,1), base_theta = c(0,0) ),
                                   lc_multiplier = 20,
                                   parallel = TRUE,
                                   NumCores = 3)

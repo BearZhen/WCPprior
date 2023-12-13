@@ -49,7 +49,8 @@ result = WCP_2D_Numerical_Density(W_func,
                           region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
                           lc_multiplier = 20,
                           parallel = TRUE,
-                          NumCores = 3)
+                          NumCores = 3
+                          )
 
 density_location = result[[1]]
 approx_WCP_density = result[[2]]
