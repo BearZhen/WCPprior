@@ -23,6 +23,7 @@ WCP_2D_Numerical_Density = function(W_func,
                           tau = mesh_width/1000,
                           cutoff = 0.01, 
                           region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
+                          #region = list(type = 'strip', corner = c(l1,u1,l2,u2), base_theta = c(0,0))
                           lc_multiplier = 20,
                           parallel = FALSE,
                           NumCores = parallel::detectCores()-1,
@@ -36,13 +37,45 @@ WCP_2D_Numerical_Density = function(W_func,
     boundary_path = region_conic(theta_0 = region$base_theta, phi_l = region$lower_angle, phi_r = region$upper_angle, eta = eta, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func)
     level_curve_type = 'LL'
     # lower bound of the second coordinate
-    L2 = 0
+    
   } else if (region$type == 'strip'){
-
-    boundary_path = region_strip(theta_0 = region$base_theta, lower_bnd = region$lower_boundary, upper_bnd = region$upper_boundary, eta = eta, direction = region$direction, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func, tau = tau)
-    level_curve_type = 'LU'
-    L2 = region$lower_boundary
-    U2 = region$upper_boundary
+    # determine horozontal or verticle and direction
+    if (  !is.finite(region$corner[1]) | !is.finite(region$corner[2])   ){
+      h_or_v = 'h'
+      L = region$corner[3]
+      U = region$corner[4]
+      if ( is.finite(region$corner[1]) ){
+        direction = 'positive'
+        level_curve_type = 'L2U2'
+      } else if ( !is.finite(region$corner[1]) & is.finite(region$corner[2]) ) {
+        direction = 'negative'
+        level_curve_type = 'L2U2'
+      } else{
+        direction = 'both'
+        level_curve_type = 'L2L2'
+      }
+    } else {
+      h_or_v = 'v'
+      L = region$corner[1]
+      U = region$corner[2]
+      if ( is.finite(region$corner[3]) ){
+        direction = 'positive'
+        level_curve_type = 'L1U1'
+      } else if ( !is.finite(region$corner[1]) & is.finite(region$corner[2]) ) {
+        direction = 'negative'
+        level_curve_type = 'L1U1'
+      } else{
+        
+        direction = 'both'
+        level_curve_type = 'L1L1'
+      }
+      
+    }
+    
+    boundary_path = region_strip(theta_0 = region$base_theta, lower_bnd = region$corner[3], upper_bnd = region$corner[4], eta = eta, type = h_or_v, direction = direction, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func, tau = tau)
+    
+ 
+    
   } else {
     stop("Wronly specifying the region or the type of region is not yet developed. Please contact our development team if you need.")
   }
@@ -58,7 +91,7 @@ WCP_2D_Numerical_Density = function(W_func,
     weights[i] = W_func(c(as.numeric(mesh$loc[i,1]), as.numeric(mesh$loc[i,2])))
   }
   
-
+  
   # the default weights_fine and mesh_finer since the default alpha is 1.
   mesh_finer = mesh
   weights_fine = weights
@@ -71,7 +104,7 @@ WCP_2D_Numerical_Density = function(W_func,
       weights_fine[i] = W_func( c(as.numeric(mesh_finer$loc[i,1]), as.numeric(mesh_finer$loc[i,2])) ) 
     }
   }
-
+  
   
   ############# obtain level curves and filter the non-complete ones ###########################
   # get lower and upper bound of the Wasserstein distance
@@ -85,7 +118,6 @@ WCP_2D_Numerical_Density = function(W_func,
   # coordinates of discrete points representing level curves, these are the locations where we will evaluate prior density.
   density_location = numeric()
   
-
   if (parallel == TRUE){
   doParallel::registerDoParallel(cl <- parallel::makeCluster(NumCores))
   parallel::clusterEvalQ(cl, library("excursions"))
@@ -109,10 +141,23 @@ WCP_2D_Numerical_Density = function(W_func,
       line_coord = sp::coordinates(levelcurve)[[1]][[1]]
       
       # if the second coordinate of level curves starts from L2 and ends at L2, like the Gaussian case
-      if (level_curve_type == 'LL'){
+      if ( level_curve_type == 'LL'  ){
         # drop the non-complete curve
-        if (line_coord[1,2] - L2 > 2*mesh_width^alpha | line_coord[length(line_coord[,1]),2] - L2 > 2*mesh_width^alpha){
+        # line_coord[1,2] - L2 > 2*mesh_width^alpha | line_coord[length(line_coord[,1]),2] - L2 > 2*mesh_width^alpha
+        if (region$lower_angle < pi/2){
+          L_angle_line_coord = atan( line_coord[1,2]/line_coord[1,1] )
+        } else{
+          L_angle_line_coord = atan( line_coord[1,2]/line_coord[1,1] ) + pi
+        }
+        if (region$upper_angle < pi/2){
+          U_angle_line_coord = atan( line_coord[length(line_coord[,1]),2]/line_coord[length(line_coord[,1]),1] )
+        } else{
+          U_angle_line_coord = atan( line_coord[length(line_coord[,1]),2]/line_coord[length(line_coord[,1]),1] ) + pi
+        }
+        
+        if ( abs(L_angle_line_coord - region$lower_angle) > 0.1*(region$upper_angle - region$lower_angle) | abs(U_angle_line_coord - region$upper_angle) > 0.1*(region$upper_angle - region$lower_angle) ) {
           return(NULL)
+          
         } else{
           # update partial arc length, compensated by the lift
           levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
@@ -121,18 +166,50 @@ WCP_2D_Numerical_Density = function(W_func,
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
         
-      } else { # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
+      } else if (level_curve_type == 'L2U2' & direction = 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
         
-        if (line_coord[1,2] - L2 > 5*mesh_width^alpha | U2 - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
+        if (line_coord[1,2] - L > 5*mesh_width^alpha | U - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
           return(NULL)
         } else{
           # update partial arc length, compensated by the lift
           levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
           # update total arc length, compensated by the lift
-          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + U2 - max(boundary_path[,2])
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + U - max(boundary_path[,2])
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
         
+      } else if (level_curve_type == 'L2U2' & direction = 'negative'  ){
+        if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(U - line_coord[1,2])  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + U - max(boundary_path[,2])
+          # update total arc length, compensated by the lift
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) +  min(boundary_path[,2])
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
+        }
+      } else if (level_curve_type == 'L2L2'){
+        if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(L - line_coord[1,2])  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
+          # update total arc length, compensated by the lift
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2])
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
+        }
+      } else if (level_curve_type == 'L1U1' & direction = 'positive'){
+        if ( abs(line_coord[1,1] - U) > 5*mesh_width^alpha | abs(L - line_coord[length(line_coord[,1]),1])  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + abs( U - max(boundary_path[,1]) )
+          # update total arc length, compensated by the lift
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + abs( min(boundary_path[,1]) - L)
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
+        }
+      } else{
+        stop{"This case is under construction, please contact our development team."}
       }
       
     }
@@ -153,41 +230,82 @@ WCP_2D_Numerical_Density = function(W_func,
     if ('try-error' %in% class(temp)){
       return(NULL)
     } else{ # otherwise, check the type pf level curve and update partial and total arc length
-      
       # obtain the coordinates of all the discrete points of the level curve
       line_coord = sp::coordinates(levelcurve)[[1]][[1]]
       
       # if the second coordinate of level curves starts from L2 and ends at L2, like the Gaussian case
-      if (level_curve_type == 'LL'){
+      if ( level_curve_type == 'LL'  ){
         # drop the non-complete curve
-        if (line_coord[1,2] - L2 > 2*mesh_width^alpha | line_coord[length(line_coord[,1]),2] - L2 > 2*mesh_width^alpha){
-          return(NULL)
+        # line_coord[1,2] - L2 > 2*mesh_width^alpha | line_coord[length(line_coord[,1]),2] - L2 > 2*mesh_width^alpha
+        if (region$lower_angle < pi/2){
+          L_angle_line_coord = atan( line_coord[1,2]/line_coord[1,1] )
         } else{
-          # update density location
-          density_location = rbind(density_location, line_coord)
-          # update partial arc length, compensated by the lift
-          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
-          parc = c(parc, levelcurve_parc)
-          # update total arc length, compensated by the lift
-          tarc = c(tarc, rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2]))
+          L_angle_line_coord = atan( line_coord[1,2]/line_coord[1,1] ) + pi
+        }
+        if (region$upper_angle < pi/2){
+          U_angle_line_coord = atan( line_coord[length(line_coord[,1]),2]/line_coord[length(line_coord[,1]),1] )
+        } else{
+          U_angle_line_coord = atan( line_coord[length(line_coord[,1]),2]/line_coord[length(line_coord[,1]),1] ) + pi
         }
         
-      } else { # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
-        
-        if (line_coord[1,2] - L2 > 5*mesh_width^alpha | U2 - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
+        if ( abs(L_angle_line_coord - region$lower_angle) > 0.1*(region$upper_angle - region$lower_angle) | abs(U_angle_line_coord - region$upper_angle) > 0.1*(region$upper_angle - region$lower_angle) ) {
           return(NULL)
+          
         } else{
-          # update density location
-          density_location = rbind(density_location, line_coord)
           # update partial arc length, compensated by the lift
           levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
-          parc = c(parc, levelcurve_parc)
           # update total arc length, compensated by the lift
-          tarc = c(tarc, rep(max(levelcurve_parc), times = length(levelcurve_parc))+ U2 - max(boundary_path[,2]) )
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2]) 
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
         
+      } else if (level_curve_type == 'L2U2' & direction = 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
+        
+        if (line_coord[1,2] - L > 5*mesh_width^alpha | U - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
+          # update total arc length, compensated by the lift
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + U - max(boundary_path[,2])
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
+        }
+        
+      } else if (level_curve_type == 'L2U2' & direction = 'negative'  ){
+        if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(U - line_coord[1,2])  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + U - max(boundary_path[,2])
+          # update total arc length, compensated by the lift
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) +  min(boundary_path[,2])
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
+        }
+      } else if (level_curve_type == 'L2L2'){
+        if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(L - line_coord[1,2])  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + min(boundary_path[,2])
+          # update total arc length, compensated by the lift
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2])
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
+        }
+      } else if (level_curve_type == 'L1U1' & direction = 'positive'){
+        if ( abs(line_coord[1,1] - U) > 5*mesh_width^alpha | abs(L - line_coord[length(line_coord[,1]),1])  > 5*mesh_width^alpha){
+          return(NULL)
+        } else{
+          # update partial arc length, compensated by the lift
+          levelcurve_parc = compute_partial_arc_lengths(line_coord)[,3] + abs( U - max(boundary_path[,1]) )
+          # update total arc length, compensated by the lift
+          tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + abs( min(boundary_path[,1]) - L)
+          return(cbind(line_coord, levelcurve_parc,tarc,W))
+        }
+      } else{
+        stop{"This case is under construction, please contact our development team."}
       }
       
+     # 
     }
     }
 
