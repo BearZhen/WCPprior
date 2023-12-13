@@ -48,7 +48,7 @@ result = WCP_2D_Numerical_Density(W_func,
                           cutoff = 0.01, 
                           region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
                           lc_multiplier = 20,
-                          parallel = TRUE,
+                          parallel = FALSE,
                           NumCores = 3
                           )
 
