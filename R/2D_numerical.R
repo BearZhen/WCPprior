@@ -166,7 +166,7 @@ WCP_2D_Numerical_Density = function(W_func,
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
         
-      } else if (level_curve_type == 'L2U2' & direction = 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
+      } else if (level_curve_type == 'L2U2' & direction == 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
         
         if (line_coord[1,2] - L > 5*mesh_width^alpha | U - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
           return(NULL)
@@ -178,7 +178,7 @@ WCP_2D_Numerical_Density = function(W_func,
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
         
-      } else if (level_curve_type == 'L2U2' & direction = 'negative'  ){
+      } else if (level_curve_type == 'L2U2' & direction == 'negative'  ){
         if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(U - line_coord[1,2])  > 5*mesh_width^alpha){
           return(NULL)
         } else{
@@ -198,7 +198,7 @@ WCP_2D_Numerical_Density = function(W_func,
           tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2])
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
-      } else if (level_curve_type == 'L1U1' & direction = 'positive'){
+      } else if (level_curve_type == 'L1U1' & direction == 'positive'){
         if ( abs(line_coord[1,1] - U) > 5*mesh_width^alpha | abs(L - line_coord[length(line_coord[,1]),1])  > 5*mesh_width^alpha){
           return(NULL)
         } else{
@@ -209,7 +209,7 @@ WCP_2D_Numerical_Density = function(W_func,
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
       } else{
-        stop{"This case is under construction, please contact our development team."}
+        stop("This case is under construction, please contact our development team.")
       }
       
     }
@@ -259,7 +259,7 @@ WCP_2D_Numerical_Density = function(W_func,
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
         
-      } else if (level_curve_type == 'L2U2' & direction = 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
+      } else if (level_curve_type == 'L2U2' & direction == 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
         
         if (line_coord[1,2] - L > 5*mesh_width^alpha | U - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
           return(NULL)
@@ -271,7 +271,7 @@ WCP_2D_Numerical_Density = function(W_func,
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
         
-      } else if (level_curve_type == 'L2U2' & direction = 'negative'  ){
+      } else if (level_curve_type == 'L2U2' & direction == 'negative'  ){
         if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(U - line_coord[1,2])  > 5*mesh_width^alpha){
           return(NULL)
         } else{
@@ -291,7 +291,7 @@ WCP_2D_Numerical_Density = function(W_func,
           tarc = rep(max(levelcurve_parc), times = length(levelcurve_parc)) + min(boundary_path[,2])
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
-      } else if (level_curve_type == 'L1U1' & direction = 'positive'){
+      } else if (level_curve_type == 'L1U1' & direction == 'positive'){
         if ( abs(line_coord[1,1] - U) > 5*mesh_width^alpha | abs(L - line_coord[length(line_coord[,1]),1])  > 5*mesh_width^alpha){
           return(NULL)
         } else{
@@ -302,7 +302,7 @@ WCP_2D_Numerical_Density = function(W_func,
           return(cbind(line_coord, levelcurve_parc,tarc,W))
         }
       } else{
-        stop{"This case is under construction, please contact our development team."}
+        stop("This case is under construction, please contact our development team.")
       }
       
      # 
