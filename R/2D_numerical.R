@@ -223,12 +223,13 @@ WCP_2D_Numerical_Density = function(W_func,
   } else {
     
     for (W in seq(from = W_lower_bound, to = W_upper_bound, length = lc_multiplier*ceiling(W_upper_bound/(mesh_width^alpha)))){
+    
     levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
                                levels = W)$contour 
     # skip if there is no such level curve
     temp = try(sp::coordinates(levelcurve)[[1]][[1]], silent = FALSE)
     if ('try-error' %in% class(temp)){
-      return(NULL)
+      next
     } else{ # otherwise, check the type pf level curve and update partial and total arc length
       # obtain the coordinates of all the discrete points of the level curve
       line_coord = sp::coordinates(levelcurve)[[1]][[1]]
@@ -249,7 +250,7 @@ WCP_2D_Numerical_Density = function(W_func,
         }
       
         if ( abs(L_angle_line_coord - region$lower_angle) > 0.1*(region$upper_angle - region$lower_angle) | abs(U_angle_line_coord - region$upper_angle) > 0.1*(region$upper_angle - region$lower_angle) ) {
-          return(NULL)
+          next
           
         } else{
           # update density location
@@ -266,7 +267,7 @@ WCP_2D_Numerical_Density = function(W_func,
       } else if (level_curve_type == 'L2U2' & direction == 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
         
         if (line_coord[1,2] - L > 5*mesh_width^alpha | U - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
-          return(NULL)
+          next
         } else{
           # update density location
           density_location = rbind(density_location, line_coord)
@@ -279,7 +280,7 @@ WCP_2D_Numerical_Density = function(W_func,
         
       } else if (level_curve_type == 'L2U2' & direction == 'negative'  ){
         if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(U - line_coord[1,2])  > 5*mesh_width^alpha){
-          return(NULL)
+          next
         } else{
           # update density location
           density_location = rbind(density_location, line_coord)
@@ -292,7 +293,7 @@ WCP_2D_Numerical_Density = function(W_func,
         }
       } else if (level_curve_type == 'L2L2'){
         if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(L - line_coord[1,2])  > 5*mesh_width^alpha){
-          return(NULL)
+          next
         } else{
           # update density location
           density_location = rbind(density_location, line_coord)
@@ -305,7 +306,7 @@ WCP_2D_Numerical_Density = function(W_func,
         }
       } else if (level_curve_type == 'L1U1' & direction == 'positive'){
         if ( abs(line_coord[1,1] - U) > 5*mesh_width^alpha | abs(L - line_coord[length(line_coord[,1]),1])  > 5*mesh_width^alpha){
-          return(NULL)
+          next
         } else{
           # update density location
           density_location = rbind(density_location, line_coord)
@@ -445,7 +446,7 @@ WCP_2D_Numerical_Density = function(W_func,
       # skip if there is no such level curve
       temp = try(sp::coordinates(levelcurve)[[1]][[1]], silent = FALSE)
       if ('try-error' %in% class(temp)){
-        return(NULL)
+       next
       } else{
         
         # otherwise, check the type pf level curve and update partial and total arc length
@@ -468,7 +469,7 @@ WCP_2D_Numerical_Density = function(W_func,
           }
           
           if ( abs(L_angle_line_coord - region$lower_angle) > 0.1*(region$upper_angle - region$lower_angle) | abs(U_angle_line_coord - region$upper_angle) > 0.1*(region$upper_angle - region$lower_angle) ) {
-            return(NULL)
+           next
             
           } else{
             # update density location
@@ -485,7 +486,7 @@ WCP_2D_Numerical_Density = function(W_func,
         } else if (level_curve_type == 'L2U2' & direction == 'positive' ){ # if the second coordinate of level curves starts from L2 and ends at U2, like the generalized Pareto case
           
           if (line_coord[1,2] - L > 5*mesh_width^alpha | U - line_coord[length(line_coord[,1]),2]  > 5*mesh_width^alpha){
-            return(NULL)
+            next
           } else{
             # update density location
             density_location = rbind(density_location, line_coord)
@@ -499,7 +500,7 @@ WCP_2D_Numerical_Density = function(W_func,
           
         } else if (level_curve_type == 'L2U2' & direction == 'negative'  ){
           if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(U - line_coord[1,2])  > 5*mesh_width^alpha){
-            return(NULL)
+            next
           } else{
             # update density location
             density_location = rbind(density_location, line_coord)
@@ -512,7 +513,7 @@ WCP_2D_Numerical_Density = function(W_func,
           }
         } else if (level_curve_type == 'L2L2'){
           if ( abs(line_coord[length(line_coord[,1]),2] - L) > 5*mesh_width^alpha | abs(L - line_coord[1,2])  > 5*mesh_width^alpha){
-            return(NULL)
+            next
           } else{
             # update density location
             density_location = rbind(density_location, line_coord)
@@ -525,7 +526,7 @@ WCP_2D_Numerical_Density = function(W_func,
           }
         } else if (level_curve_type == 'L1U1' & direction == 'positive'){
           if ( abs(line_coord[1,1] - U) > 5*mesh_width^alpha | abs(L - line_coord[length(line_coord[,1]),1])  > 5*mesh_width^alpha){
-            return(NULL)
+            next
           } else{
             # update density location
             density_location = rbind(density_location, line_coord)
