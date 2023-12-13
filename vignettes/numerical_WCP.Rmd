@@ -39,7 +39,7 @@ W_func <- function(x){sqrt(x[1]^2+x[2]^2)}
 We now define the parameters and the region:
 ```{r}
 cutoff = 0.01
-mesh_width = 0.5
+mesh_width = 0.1
 # user-specified hyperparameter
 eta = 1
 
@@ -69,7 +69,7 @@ We begin by extracting the mesh and creating a pixelized mesh with the `fm_pixel
 ```{r}
 library(fmesher)
 mesh <- result$mesh
-pxl_mesh <- fm_pixels(mesh)
+pxl <- fm_pixels(mesh)
 ```
 
 We will now obtain the values of the approximated density at the mesh nodes. To this end, we need the elements `basis` and `val` from the returned list. The `basis` contains the matrix that maps the level curve locations to the mesh nodes, and `val` contains the values of the approximated density at the level curve locations.
@@ -80,29 +80,26 @@ dens_val <- result$val
 dens_mesh <- basis%*%dens_val
 ```
 
-Let us obtain the new basis functions
+Let us obtain the values of the approximated density at the pixelated mesh:
 
 ```{r}
-# extract (theta1, theta2) where the approximated density defines on
-density_location = result[[1]]
-# extract approximated density
-approx_WCP_density = result[[2]]
+pxl$val <- 
+    fm_evaluate(mesh, pxl, field = 
+      dens_mesh)
+```
 
-data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector(approx_WCP_density))
-data = data.frame(data)
-g = ggplot(data, aes(X1, X2, color = X3))+
-  geom_stars()+
-  scale_color_gradient(low="blue", high="red") +
-  labs(x = expression(theta[1]), y = expression(theta[2])) + 
-  guides(col = guide_colourbar(title = "Density"))+
-  theme(legend.position = "top",
-        legend.key.height = unit(0.1, 'cm'), #change legend key height
-        legend.key.width = unit(0.5, 'cm'), #change legend key width
-        legend.title = element_text(size=7), #change legend title font size
-        legend.text = element_text(size=5),#change legend text font size
-        axis.text=element_text(size=7),
-        axis.title=element_text(size=7)) 
-g
+Let us now plot the approximated density:
+
+```{r}
+library(viridis)
+
+ ggplot() +
+    geom_tile(
+      data = pxl,
+      aes(geometry = geometry, fill = val),
+      stat = "sf_coordinates"
+    ) + scale_fill_viridis()
+    
 ```
 
 Now we show the absolute error between the true and the approximated densities. 
