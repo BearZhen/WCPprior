@@ -82,7 +82,8 @@ WCP_2D_Numerical_Density = function(W_func,
   
   mesh = fmesher::fm_mesh_2d(boundary = fmesher::fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width)
   if (visual_mesh){
-    plot(mesh)
+    g <- ggplot2::ggplot() + fmesher::geom_fm(data = mesh)
+    plot(g)
   }
   
   # weights on mesh
@@ -581,7 +582,7 @@ WCP_2D_Numerical_Density = function(W_func,
   approx_WCP_density = eta * approx_detJ_abs * exp(-eta * W_distance)/tarc
   mass_lump_C = fmesher::fm_fem(mesh, order = 1)$c0
   
-  result = list(density_location, approx_WCP_density, mass_lump_C, A_new, W_distance, parc, tarc, approx_detJ_abs)
+  result = list(loc = density_location, val = approx_WCP_density, C = mass_lump_C, basis = A_new, W_distance = W_distance, partial_arclength = parc, total_arclength = tarc, approx_det_jacobian = approx_detJ_abs, mesh = mesh)
   return(result)
   
 }

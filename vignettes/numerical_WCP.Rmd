@@ -2,6 +2,10 @@
 title: "Numerical approximations of WCP priors"
 date: "Created: 2023-12-13. Last modified: `r Sys.Date()`."
 output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Numerical approximations of WCP priors}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 
@@ -27,33 +31,57 @@ That is, by solving $P(W > w) = \text{cutoff}$, the upper bound $w = -log(\text{
 (4), region information that specifies boundary of the bounded domain of $\boldsymbol{\theta}$ determined by cutoff, type of shape of the domain.\
 (5), mesh width that determine how fine the mesh is on the bounded domain.\
 
-The following code performs the approximation.
+Let us define the Wasserstein distance function, where `x[1]` is the mean parameter, `x[2]` is the standard deviation parameter:
 ```{r}
-# the Wasserstein distance function, where x[1] is the mean parameter, x[2] is the standard deviation parameter.
 W_func <- function(x){sqrt(x[1]^2+x[2]^2)}
+```
+
+We now define the parameters and the region:
+```{r}
+cutoff = 0.01
+mesh_width = 0.5
 # user-specified hyperparameter
 eta = 1
-# cutoff parameter
-cutoff = 0.01
-# region information, type of region is conic, range of the angle of the conic region is from 0 to pi and the base model parameter is (0,0)
-region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0))
-# mesh width
-mesh_width = 0.5
 
-# call the function to compute numerical approximation of the WCP prior.
-# By setting parallel = TRUE, user can run the function with multiple cores and NumCores specifies number of cores.
-# By setting visual_mesh = TRUE, 
+region = list(type = 'conic', lower_angle = 0, 
+upper_angle = pi, base_theta = c(0,0))
+```
+Observe that the type of region is `conic`, the range of the angle of the conic region is from 0 to $\pi$ and the base model parameter is `(0,0)`.
+
+The following code performs the approximation by using the `WCP_2D_Numerical_Density()` function. By setting `parallel = TRUE`, user can run the function with multiple cores and `NumCores` specifies number of cores. We will set `visual_mesh = TRUE` to obtain a plot of the region along with the constructed mesh.
+
+```{r, warning=FALSE}
 result = WCP_2D_Numerical_Density(W_func,
-                          eta = 1,
-                          mesh_width = 0.4, 
-                          cutoff = 0.01, 
-                          region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
+                          eta = eta,
+                          mesh_width = mesh_width, 
+                          cutoff = cutoff, 
+                          region = region,
                           parallel = TRUE,
                           NumCores = 3,
                           visual_mesh = TRUE)
 ```
 
-Now we show the approximated density.
+This function returns the values of the approximated density along the level curves.
+Our goal now is to plot the approximated density. To this end, we will obtain the approximated values at the mesh, then plot its values on a pixelated cover of the mesh.
+
+We begin by extracting the mesh and creating a pixelized mesh with the `fm_pixels()` function from the `fmesher` package.
+
+```{r}
+library(fmesher)
+mesh <- result$mesh
+pxl_mesh <- fm_pixels(mesh)
+```
+
+We will now obtain the values of the approximated density at the mesh nodes. To this end, we need the elements `basis` and `val` from the returned list. The `basis` contains the matrix that maps the level curve locations to the mesh nodes, and `val` contains the values of the approximated density at the level curve locations.
+
+```{r}
+basis <- result$basis
+dens_val <- result$val 
+dens_mesh <- basis%*%dens_val
+```
+
+Let us obtain the new basis functions
+
 ```{r}
 # extract (theta1, theta2) where the approximated density defines on
 density_location = result[[1]]
@@ -63,7 +91,7 @@ approx_WCP_density = result[[2]]
 data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector(approx_WCP_density))
 data = data.frame(data)
 g = ggplot(data, aes(X1, X2, color = X3))+
-  geom_point(size = 0.1)+
+  geom_stars()+
   scale_color_gradient(low="blue", high="red") +
   labs(x = expression(theta[1]), y = expression(theta[2])) + 
   guides(col = guide_colourbar(title = "Density"))+
@@ -88,7 +116,7 @@ g = ggplot(data, aes(X1, X2, color = X3))+
   geom_point(size = 0.1)+
   scale_color_gradient(low="blue", high="red") +
   labs(x = expression(theta[1]), y = expression(theta[2])) + 
-  guides(col = guide_colourbar(title = "Density"))+
+  guides(col = guide_colourbar(title = "Error"))+
   theme(legend.position = "top",
         legend.key.height = unit(0.1, 'cm'), #change legend key height
         legend.key.width = unit(0.5, 'cm'), #change legend key width
