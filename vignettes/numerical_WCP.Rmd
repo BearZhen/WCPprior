@@ -18,18 +18,19 @@ library(ggplot2)
 ```
 
 
-## An example with numerical approximation of bivariate WCP$_2$ prior of mean and standard deviation of Gaussian distribution.
+## Bivariate WCP$_2$ prior of mean and standard deviation of Gaussian distribution.
 
 The theoretical details of deriving bivariate WCP prior density can be found on Recipe 1, Section 4.2 from https://arxiv.org/pdf/2312.04481.pdf, and its implementation details
 can be found on Recipe 4, Section 5.2 from the same document.
 
 The function that gives numerical approximation of bivariate WCP prior requires some information.\
-(1), A function that takes values of the two-dimensional parameter $\boldsymbol{\theta} = (\theta_1, \theta_2)$ and returns the Wasserstein distance $W(\boldsymbol{\theta})$.\
-(2), $\eta$, the user-specified hyperparameter for WCP prior.\
-(3), cutoff parameter that determines upper bound of the Wasserstein distance $W$ in case of the parameter space $\boldsymbol{\theta}$ is unbounded. 
+
+1. A function that takes values of the two-dimensional parameter $\boldsymbol{\theta} = (\theta_1, \theta_2)$ and returns the Wasserstein distance $W(\boldsymbol{\theta})$.
+2. $\eta$, the user-specified hyperparameter for WCP prior.
+3. cutoff parameter that determines upper bound of the Wasserstein distance $W$ in case of the parameter space $\boldsymbol{\theta}$ is unbounded. 
 That is, by solving $P(W > w) = \text{cutoff}$, the upper bound $w = -log(\text{cutoff})/\eta$. Thus, we can approximate the WCP prior on a bounded domain.\
-(4), region information that specifies boundary of the bounded domain of $\boldsymbol{\theta}$ determined by cutoff, type of shape of the domain.\
-(5), mesh width that determine how fine the mesh is on the bounded domain.\
+4. region information that specifies boundary of the bounded domain of $\boldsymbol{\theta}$ determined by cutoff, type of shape of the domain.\
+5. mesh width that determine how fine the mesh is on the bounded domain.\
 
 Let us define the Wasserstein distance function, where `x[1]` is the mean parameter, `x[2]` is the standard deviation parameter:
 ```{r}
@@ -150,7 +151,7 @@ TVD_error = 0.5 * (sum(mass_lump_C %*%
 print(TVD_error)
 ```
 
-Our package also provides a function to compute point-wise analytic bivariate WCP$_2$ prior of mean and standard deviation of Gaussian distribution. To use this function, users just need to provide values of parameters, $\eta$ and base model mean parameter $\text{base_mean}$. The base model standard deviation parameter is fixed to 0. Now we use this function to compute the densities on all the coordinates where the numerical approximation densities are computed.
+The `WCPprior` package also provides a function to compute point-wise analytic bivariate WCP$_2$ prior of mean and standard deviation of Gaussian distribution. To use this function, users just need to provide values of parameters, $\eta$ and base model mean parameter $\text{base_mean}$. The base model standard deviation parameter is fixed to 0. Now we use this function to compute the densities on all the coordinates where the numerical approximation densities are computed.
 
 Let us start by obtaining the analytic density with the help of the `WCP2_2D_Gaussian_analytic()` function
 
@@ -197,7 +198,7 @@ g
 
 
 
-## An example with numerical approximation of 1d WCP$_2$ prior of reciprocal of degree of freedom parameter of t-distribution.
+## WCP$_2$ prior of reciprocal of degree of freedom of t-distribution.
 
 The theoretical implementation details of WCP$_2$ prior of reciprocal of degree of freedom parameter of t-distribution can be found at 
 Section 5.1 from https://arxiv.org/pdf/2312.04481.pdf. Let $\xi$ denote the parameter of interest. To use our function to construct numerical approximation of WCP prior of a single parameter, users need to provide the following information in general:\
