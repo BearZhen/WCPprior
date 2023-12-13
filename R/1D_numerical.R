@@ -18,17 +18,9 @@ my.grad = function(func, x){
 #' @param eta User specified parameter of the WCP prior.
 #' @param cutoff1 Cutoff parameter that decide upper bound of the Wasserstein distance on the right hand side of base_theta.
 #' @param cutoff2 Cutoff parameter that decide upper bound of the Wasserstein distance on the left hand side of base_theta.
-<<<<<<< Updated upstream
 #' @param mesh_width Mesh width to be used. If not used, mesh_n will be used.
 #' @param mesh_n Number of mesh nodes to be used. Will not be used if mesh_width is given.
 #' @param inla_table Should the results be returned as a table to be used in INLA? Default is FALSE.
-||||||| Stash base
-#' @param mesh_width Mesh width.
-=======
-#' @param mesh_width Mesh width.
-#' @param inla_table Logic value indicates that whether to provide the prior in the format that INLA can use.
-#' 
->>>>>>> Stashed changes
 #' @return A list of density locations and densities evaluated on those locations.
 #' @export
 #'

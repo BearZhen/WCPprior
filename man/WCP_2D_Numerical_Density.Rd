@@ -7,22 +7,15 @@
 WCP_2D_Numerical_Density(
   W_func,
   eta,
-  mesh_width = NULL,
+  mesh_width,
   alpha = 1,
   tau = mesh_width/1000,
   cutoff = 0.01,
   region = list(type = "conic", lower_angle = 0, upper_angle = pi, base_theta = c(0, 0)),
   lc_multiplier = 20,
-<<<<<<< Updated upstream
-  parallel = FALSE,
-  NumCores = parallel::detectCores() - 1
-||||||| Stash base
-  NumCores
-=======
   parallel = FALSE,
   NumCores = parallel::detectCores() - 1,
   visual_mesh = FALSE
->>>>>>> Stashed changes
 )
 }
 \arguments{
@@ -38,7 +31,7 @@ WCP_2D_Numerical_Density(
 
 \item{cutoff}{Cutoff parameter indicating probability tail mass for the Wasserstein distance.}
 
-\item{region}{A list that specify region information.}
+\item{region}{A list that specify region information. For example, for strip regions (regions of the type IxJ, where I = (a,b) and J = (c,d) are intervals, with one of them being unbounded), one can set `region = list(type = "strip", base_theta = c(a,c), corners = c(a,b,c,d))`, where some of the values `a`,`b`,`c` or `d` can be `-Inf` or `Inf`. If the type is conic, the list must be set, for example, as list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)), where `lower_angle` and `upper_angle` contains the smaller and larger angles that determine the cone.}
 
 \item{lc_multiplier}{Multiplier determines number of level curves}
 

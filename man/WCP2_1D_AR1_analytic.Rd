@@ -4,13 +4,7 @@
 \alias{WCP2_1D_AR1_analytic}
 \title{The 1d analytic density WCP prior for phi of stationary AR1 process}
 \usage{
-<<<<<<< Updated upstream:man/WCP_1D_AR1_analytic.Rd
-WCP_1D_AR1_analytic(seq_phi, eta, n, sigma, inla_table = FALSE)
-||||||| Stash base:man/WCP_1D_AR1_analytic.Rd
-WCP_1D_AR1_analytic(seq_phi, eta, n, sigma)
-=======
-WCP2_1D_AR1_analytic(seq_phi, eta, n, sigma, inla_table)
->>>>>>> Stashed changes:man/WCP2_1D_AR1_analytic.Rd
+WCP2_1D_AR1_analytic(seq_phi, eta, n, sigma, inla_table = FALSE)
 }
 \arguments{
 \item{seq_phi}{A vector of values of phi parameter.}
