@@ -8,8 +8,8 @@
 <meta name="description" content="WCPprior">
 <title>Bridge to R-INLA and Stan • WCPprior</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Roboto_Slab-0.4.7/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Roboto_Slab-0.4.8/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Bridge to R-INLA and Stan">
@@ -98,11 +98,11 @@ prior in the format that R-INLA can use.</p>
 deviation 0.1 and <span class="math inline">\(\phi = 0.2\)</span>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># import INLA</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BearZhen/WCPprior/" class="external-link">WCPprior</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vpnsctl.github.io/WCPprior/">WCPprior</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: Matrix</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
-<pre><code><span><span class="co">## This is INLA_23.11.01 built 2023-11-01 19:16:01 UTC.</span></span>
+<pre><code><span><span class="co">## This is INLA_23.12.06-1 built 2023-12-06 16:40:08 UTC.</span></span>
 <span><span class="co">##  - See www.r-inla.org/contact-us for how to get help.</span></span>
 <span><span class="co">##  - List available models/likelihoods/etc with inla.list.models()</span></span>
 <span><span class="co">##  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span></code></pre>
@@ -137,7 +137,7 @@ WCP<span class="math inline">\(_2\)</span> of <span class="math inline">\(\phi \
 <span><span class="co"># fit the model by INLA</span></span>
 <span><span class="va">result</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">data</span>, family<span class="op">=</span><span class="va">family</span>,</span>
 <span>             control.predictor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>compute<span class="op">=</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://geobosh.github.io/fGarchDoc/reference/methods-summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
 <span><span class="co">##    c("inla.core(formula = formula, family = family, contrasts = contrasts, </span></span>
@@ -157,28 +157,28 @@ WCP<span class="math inline">\(_2\)</span> of <span class="math inline">\(\phi \
 <span><span class="co">##    silent = silent, ", " inla.mode = inla.mode, safe = FALSE, debug = </span></span>
 <span><span class="co">##    debug, .parent.frame = .parent.frame)" ) </span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 7.5, Running = 0.869, Post = 0.0228, Total = 8.39 </span></span>
+<span><span class="co">##     Pre = 0.252, Running = 0.277, Post = 0.0198, Total = 0.548 </span></span>
 <span><span class="co">## Random effects:</span></span>
 <span><span class="co">##   Name     Model</span></span>
 <span><span class="co">##     t AR1 model</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Model hyperparameters:</span></span>
 <span><span class="co">##                                             mean       sd 0.025quant 0.5quant</span></span>
-<span><span class="co">## Precision for the Gaussian observations 1.91e+02 8.02e+01     75.281 1.77e+02</span></span>
-<span><span class="co">## Precision for t                         2.17e+04 2.40e+04   1386.396 1.41e+04</span></span>
-<span><span class="co">## Rho for t                               5.00e-03 6.97e-01     -0.987 9.00e-03</span></span>
+<span><span class="co">## Precision for the Gaussian observations 2.16e+02    90.94     85.122 2.01e+02</span></span>
+<span><span class="co">## Precision for t                         2.16e+04 24015.58   1373.013 1.41e+04</span></span>
+<span><span class="co">## Rho for t                               1.00e-03     0.71     -0.991 4.00e-03</span></span>
 <span><span class="co">##                                         0.975quant     mode</span></span>
-<span><span class="co">## Precision for the Gaussian observations   3.85e+02  152.118</span></span>
-<span><span class="co">## Precision for t                           8.55e+04 3749.707</span></span>
-<span><span class="co">## Rho for t                                 9.88e-01    0.997</span></span>
+<span><span class="co">## Precision for the Gaussian observations     436.34  172.175</span></span>
+<span><span class="co">## Precision for t                           85392.65 3708.260</span></span>
+<span><span class="co">## Rho for t                                     0.99   -0.999</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  6.19 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  6.97 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># visualize the result</span></span>
-<span><span class="fu"><a href="https://geobosh.github.io/fGarchDoc/reference/methods-plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, col<span class="op">=</span><span class="st">"blue"</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, col<span class="op">=</span><span class="st">"blue"</span>,</span>
 <span>     ylab<span class="op">=</span><span class="st">"fitting result"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">t</span><span class="op">[</span> ,<span class="st">"mean"</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="INLA_and_Stan_utilities_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>

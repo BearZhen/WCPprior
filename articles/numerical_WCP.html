@@ -8,8 +8,8 @@
 <meta name="description" content="WCPprior">
 <title>Numerical approximations of WCP priors • WCPprior</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Roboto_Slab-0.4.7/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Roboto_Slab-0.4.8/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Numerical approximations of WCP priors">
@@ -85,34 +85,40 @@ modified: 2023-12-13.</h4>
 obtain 1D and 2D numerical and analytic WCP prior.</p>
 <p>Import relevant libraries.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BearZhen/WCPprior/" class="external-link">WCPprior</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vpnsctl.github.io/WCPprior/">WCPprior</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="an-example-with-numerical-approximation-of-bivariate-wcp_2-prior-of-mean-and-standard-deviation-of-gaussian-distribution-">An example with numerical approximation of bivariate WCP<span class="math inline">\(_2\)</span> prior of mean and standard deviation
-of Gaussian distribution.<a class="anchor" aria-label="anchor" href="#an-example-with-numerical-approximation-of-bivariate-wcp_2-prior-of-mean-and-standard-deviation-of-gaussian-distribution-"></a>
+<h2 id="bivariate-wcp_2-prior-of-mean-and-standard-deviation-of-gaussian-distribution-">Bivariate WCP<span class="math inline">\(_2\)</span> prior of mean
+and standard deviation of Gaussian distribution.<a class="anchor" aria-label="anchor" href="#bivariate-wcp_2-prior-of-mean-and-standard-deviation-of-gaussian-distribution-"></a>
 </h2>
 <p>The theoretical details of deriving bivariate WCP prior density can
 be found on Recipe 1, Section 4.2 from <a href="https://arxiv.org/pdf/2312.04481.pdf" class="external-link uri">https://arxiv.org/pdf/2312.04481.pdf</a>, and its
 implementation details can be found on Recipe 4, Section 5.2 from the
 same document.</p>
 <p>The function that gives numerical approximation of bivariate WCP
-prior requires some information.<br>
-(1), A function that takes values of the two-dimensional parameter <span class="math inline">\(\boldsymbol{\theta} = (\theta_1,
-\theta_2)\)</span> and returns the Wasserstein distance <span class="math inline">\(W(\boldsymbol{\theta})\)</span>.<br>
-(2), <span class="math inline">\(\eta\)</span>, the user-specified
-hyperparameter for WCP prior.<br>
-(3), cutoff parameter that determines upper bound of the Wasserstein
+prior requires some information.<br></p>
+<ol style="list-style-type: decimal">
+<li>A function that takes values of the two-dimensional parameter <span class="math inline">\(\boldsymbol{\theta} = (\theta_1,
+\theta_2)\)</span> and returns the Wasserstein distance <span class="math inline">\(W(\boldsymbol{\theta})\)</span>.</li>
+<li>
+<span class="math inline">\(\eta\)</span>, the user-specified
+hyperparameter for WCP prior.</li>
+<li>cutoff parameter that determines upper bound of the Wasserstein
 distance <span class="math inline">\(W\)</span> in case of the parameter
 space <span class="math inline">\(\boldsymbol{\theta}\)</span> is
 unbounded. That is, by solving <span class="math inline">\(P(W &gt; w) =
 \text{cutoff}\)</span>, the upper bound <span class="math inline">\(w =
 -log(\text{cutoff})/\eta\)</span>. Thus, we can approximate the WCP
 prior on a bounded domain.<br>
-(4), region information that specifies boundary of the bounded domain of
+</li>
+<li>region information that specifies boundary of the bounded domain of
 <span class="math inline">\(\boldsymbol{\theta}\)</span> determined by
 cutoff, type of shape of the domain.<br>
-(5), mesh width that determine how fine the mesh is on the bounded
-domain.<br></p>
+</li>
+<li>mesh width that determine how fine the mesh is on the bounded
+domain.<br>
+</li>
+</ol>
 <p>Let us define the Wasserstein distance function, where
 <code>x[1]</code> is the mean parameter, <code>x[2]</code> is the
 standard deviation parameter:</p>
@@ -143,7 +149,7 @@ with the constructed mesh.</p>
 <span>                          cutoff <span class="op">=</span> <span class="va">cutoff</span>, </span>
 <span>                          region <span class="op">=</span> <span class="va">region</span>,</span>
 <span>                          parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                          NumCores <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                          NumCores <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                          visual_mesh <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="numerical_WCP_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>This function returns the values of the approximated density along
@@ -175,10 +181,9 @@ mesh:</p>
 <span>      <span class="va">dens_mesh</span><span class="op">)</span></span></code></pre></div>
 <p>Let us now plot the approximated density in log scale:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/" class="external-link">viridis</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Loading required package: viridisLite</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/" class="external-link">viridis</a></span><span class="op">)</span></span>
+<span></span>
+<span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile</a></span><span class="op">(</span></span>
 <span>      data <span class="op">=</span> <span class="va">pxl</span>,</span>
 <span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>geometry <span class="op">=</span> <span class="va">geometry</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">val</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -188,21 +193,19 @@ mesh:</p>
 <p>Now we show the absolute error between the true and the approximated
 densities. We begin by obtaining the values of the true density at the
 pixelated locations:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE</span></span></code></pre>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">coord_pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">pxl</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="va">coord_pxl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">pxl</span><span class="op">)</span></span>
 <span><span class="co"># compute the true density</span></span>
 <span><span class="va">true_WCP_density</span> <span class="op">=</span> <span class="op">(</span> <span class="fl">1</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">coord_pxl</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> </span>
 <span>                <span class="va">coord_pxl</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">)</span> <span class="op">*</span> <span class="va">eta</span> <span class="op">*</span> </span>
 <span>                <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">eta</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">coord_pxl</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> </span>
 <span>                <span class="va">coord_pxl</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="va">pi</span></span></code></pre></div>
 <p>We can now add the absolute errors at the <code>pxl</code> list:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pxl</span><span class="op">$</span><span class="va">error</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">pxl</span><span class="op">$</span><span class="va">val</span> <span class="op">-</span> <span class="va">true_WCP_density</span><span class="op">)</span></span></code></pre></div>
 <p>Now, the error plot in log scale:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile</a></span><span class="op">(</span></span>
 <span>      data <span class="op">=</span> <span class="va">pxl</span>,</span>
@@ -214,33 +217,33 @@ pixelated locations:</p>
 approximated distribution, we can do the following. We start by obtainig
 the lumped mass matrix, which is a matrix that contains the areas of the
 triangles of the mesh:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mass_lump_C</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">$</span><span class="va">C</span></span></code></pre></div>
 <p>Let us now obtain the value of the true density at the mesh
 locations:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">true_WCP_density_mesh</span> <span class="op">=</span> <span class="op">(</span> <span class="fl">1</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">$</span><span class="va">loc</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> </span>
 <span>                <span class="va">mesh</span><span class="op">$</span><span class="va">loc</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">)</span> <span class="op">*</span> <span class="va">eta</span> <span class="op">*</span> </span>
 <span>                <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">eta</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">mesh</span><span class="op">$</span><span class="va">loc</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> </span>
 <span>                <span class="va">mesh</span><span class="op">$</span><span class="va">loc</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="va">pi</span></span></code></pre></div>
 <p>We can now compute the approximation of the total variation norm:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">TVD_error</span> <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">mass_lump_C</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> </span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">dens_mesh</span>,ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">-</span> </span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">true_WCP_density_mesh</span>,ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>        <span class="va">cutoff</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">TVD_error</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 0.09359713</span></span></code></pre>
-<p>Our package also provides a function to compute point-wise analytic
-bivariate WCP<span class="math inline">\(_2\)</span> prior of mean and
-standard deviation of Gaussian distribution. To use this function, users
-just need to provide values of parameters, <span class="math inline">\(\eta\)</span> and base model mean parameter <span class="math inline">\(\text{base_mean}\)</span>. The base model standard
+<pre><code><span><span class="co">## [1] 0.01857961</span></span></code></pre>
+<p>The <code>WCPprior</code> package also provides a function to compute
+point-wise analytic bivariate WCP<span class="math inline">\(_2\)</span>
+prior of mean and standard deviation of Gaussian distribution. To use
+this function, users just need to provide values of parameters, <span class="math inline">\(\eta\)</span> and base model mean parameter <span class="math inline">\(\text{base_mean}\)</span>. The base model standard
 deviation parameter is fixed to 0. Now we use this function to compute
 the densities on all the coordinates where the numerical approximation
 densities are computed.</p>
 <p>Let us start by obtaining the analytic density with the help of the
 <code><a href="../reference/WCP2_2D_Gaussian_analytic.html">WCP2_2D_Gaussian_analytic()</a></code> function</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analytic_density</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">coord_pxl</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
@@ -253,11 +256,11 @@ densities are computed.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Let us now compare the above density with the true density we
 computed manually:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">true_WCP_density</span> <span class="op">-</span> <span class="va">analytic_density</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 <p>We will now plot the analytic density:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">coord_pxl</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">coord_pxl</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">analytic_density</span><span class="op">)</span><span class="op">)</span></span>
@@ -278,8 +281,8 @@ computed manually:</p>
 <p><img src="numerical_WCP_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="an-example-with-numerical-approximation-of-1d-wcp_2-prior-of-reciprocal-of-degree-of-freedom-parameter-of-t-distribution-">An example with numerical approximation of 1d WCP<span class="math inline">\(_2\)</span> prior of reciprocal of degree of
-freedom parameter of t-distribution.<a class="anchor" aria-label="anchor" href="#an-example-with-numerical-approximation-of-1d-wcp_2-prior-of-reciprocal-of-degree-of-freedom-parameter-of-t-distribution-"></a>
+<h2 id="wcp_2-prior-of-reciprocal-of-degree-of-freedom-of-t-distribution-">WCP<span class="math inline">\(_2\)</span> prior of reciprocal of
+degree of freedom of t-distribution.<a class="anchor" aria-label="anchor" href="#wcp_2-prior-of-reciprocal-of-degree-of-freedom-of-t-distribution-"></a>
 </h2>
 <p>The theoretical implementation details of WCP<span class="math inline">\(_2\)</span> prior of reciprocal of degree of
 freedom parameter of t-distribution can be found at Section 5.1 from <a href="https://arxiv.org/pdf/2312.04481.pdf" class="external-link uri">https://arxiv.org/pdf/2312.04481.pdf</a>. Let <span class="math inline">\(\xi\)</span> denote the parameter of interest. To
@@ -299,15 +302,9 @@ domain, we do not need to provide the cutoff parameter in this case.
 Also, an analytic expression of <span class="math inline">\(W(\xi)\)</span> is not available in our case, we
 have to compute it numerically by numerical integration (see Remark 1
 from <a href="https://arxiv.org/pdf/2312.04481.pdf" class="external-link uri">https://arxiv.org/pdf/2312.04481.pdf</a>).</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.rmetrics.org" class="external-link">fGarch</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## NOTE: Packages 'fBasics', 'timeDate', and 'timeSeries' are no longer</span></span>
-<span><span class="co">## attached to the search() path when 'fGarch' is attached.</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## If needed attach them yourself in your R script by e.g.,</span></span>
-<span><span class="co">##         require("timeSeries")</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># The Wasserstein distance function by numerical integration</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.rmetrics.org" class="external-link">fGarch</a></span><span class="op">)</span></span>
+<span><span class="co"># The Wasserstein distance function by numerical integration</span></span>
 <span><span class="va">W2distanceGt</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">xi</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="co"># xi is 1/nu where nu is dof of t-distribution</span></span>
 <span>  <span class="va">integrand</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">p</span>,<span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
@@ -319,7 +316,7 @@ from <a href="https://arxiv.org/pdf/2312.04481.pdf" class="external-link uri">ht
 <span><span class="op">}</span></span></code></pre></div>
 <p>However, to call the above function frequently is not economic, we
 construct an interpolated function for <span class="math inline">\(W(\xi)\)</span> by the following code.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># a sequence of xi</span></span>
 <span><span class="va">Xi</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">0.01</span>,to <span class="op">=</span> <span class="fl">0.49</span>,by <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="co"># obtain a sequence of W(xi) by W2distanceGt function</span></span>
@@ -339,7 +336,7 @@ construct an interpolated function for <span class="math inline">\(W(\xi)\)</spa
 <p>We determine <span class="math inline">\(\eta\)</span> by requiring
 <span class="math inline">\(P(\text{W}(\xi) &gt; U) =
 \alpha\)</span>.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">alpha</span> <span class="op">=</span> <span class="fl">0.3</span></span>
 <span><span class="va">U</span> <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="va">eta</span> <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">alpha</span><span class="op">)</span><span class="op">/</span><span class="fu">W2d</span><span class="op">(</span><span class="va">U</span><span class="op">)</span></span></code></pre></div>
@@ -350,7 +347,7 @@ parameter. <span class="math inline">\(\text{L}\)</span> and <span class="math i
 interval of the parameter of interest. <span class="math inline">\(\text{mesh_width}\)</span> denote mesh width of
 the domain. User may instead input <span class="math inline">\(\text{mesh_n}\)</span> which specifies number of
 mesh nodes to determine the mesh.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">=</span> <span class="fu"><a href="../reference/WCP_1D_Numerical_Density.html">WCP_1D_Numerical_Density</a></span><span class="op">(</span>base_theta <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>                                   L <span class="op">=</span> <span class="fl">0</span>, </span>
 <span>                                   L_included <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -362,7 +359,7 @@ mesh nodes to determine the mesh.</p>
 <p>The output contains a vector of values of <span class="math inline">\(\xi\)</span> and a vector approximated densities
 evaluated at those <span class="math inline">\(\xi\)</span>. The
 visualization of the result is:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">result</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, density <span class="op">=</span> <span class="va">result</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">density</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="numerical_WCP_files/figure-html/unnamed-chunk-22-1.png" width="700"></p>

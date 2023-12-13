@@ -1,10 +1,10 @@
-pandoc: 3.1.9
+pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   INLA_and_Stan_utilities: INLA_and_Stan_utilities.html
   numerical_WCP: numerical_WCP.html
-last_built: 2023-12-13T20:33Z
+last_built: 2023-12-13T21:54Z
 urls:
   reference: https://vpnsctl.github.io/WCPprior/reference
   article: https://vpnsctl.github.io/WCPprior/articles
