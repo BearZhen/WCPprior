@@ -14,9 +14,17 @@ WCP_1D_Numerical_Density(
   mesh_n = 100,
   cutoff1 = 0.01,
   cutoff2 = NULL,
+<<<<<<< Updated upstream
   L_included = FALSE,
   U_included = FALSE,
   inla_table = FALSE
+||||||| Stash base
+  mesh_width
+=======
+  L_included = FALSE,
+  U_included = FALSE,
+  return_for_inla = FALSE
+>>>>>>> Stashed changes
 )
 }
 \arguments{
@@ -30,19 +38,37 @@ WCP_1D_Numerical_Density(
 
 \item{U}{Upper bound of theta.}
 
+<<<<<<< Updated upstream
 \item{mesh_width}{Mesh width to be used. If not used, mesh_n will be used.}
 
 \item{mesh_n}{Number of mesh nodes to be used. Will not be used if mesh_width is given.}
+||||||| Stash base
+\item{U_included}{If U should be included in the domain, a TRUE or FALSE value}
+
+\item{W_func}{A function that returns the Wasserstein distance given theta.}
+
+\item{eta}{User specified parameter of the WCP prior.}
+=======
+\item{mesh_width}{Mesh width.}
+>>>>>>> Stashed changes
 
 \item{cutoff1}{Cutoff parameter that decide upper bound of the Wasserstein distance on the right hand side of base_theta.}
 
 \item{cutoff2}{Cutoff parameter that decide upper bound of the Wasserstein distance on the left hand side of base_theta.}
 
+<<<<<<< Updated upstream
 \item{L_included}{If L should be included in the domain, a TRUE or FALSE value}
 
 \item{U_included}{If U should be included in the domain, a TRUE or FALSE value}
 
 \item{inla_table}{Should the results be returned as a table to be used in INLA? Default is FALSE.}
+||||||| Stash base
+\item{mesh_width}{Mesh width.}
+=======
+\item{L_included}{If L should be included in the domain, a TRUE or FALSE value}
+
+\item{U_included}{If U should be included in the domain, a TRUE or FALSE value}
+>>>>>>> Stashed changes
 }
 \value{
 A list of density locations and densities evaluated on those locations.

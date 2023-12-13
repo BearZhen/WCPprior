@@ -11,6 +11,7 @@
 #' @param parallel A logic value that indicating whether the user wants to run the function with multiple cpu.
 #' @param lc_multiplier Multiplier determines number of level curves
 #' @param NumCores Number of cores to run the function.
+#' @param visual_mesh A logic value to determin whether to plot the mesh.
 #'
 #' @return A list of density locations, densities evaluated on those locations and other utilities that can help access accuracy.
 #' @export
@@ -24,20 +25,20 @@ WCP_2D_Numerical_Density = function(W_func,
                           region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
                           lc_multiplier = 20,
                           parallel = FALSE,
-                          NumCores = parallel::detectCores()-1) {
+                          NumCores = parallel::detectCores()-1,
+                          visual_mesh = FALSE) {
   
   ######################################## mesh generation ######################################
   ## mesh for interpolating the Wasserstein distance, partial derivatives of the Wasserstein distance
-  print('begin')
   if (region$type == 'conic'){
     # boundary path
-    print("conic")
+
     boundary_path = region_conic(theta_0 = region$base_theta, phi_l = region$lower_angle, phi_r = region$upper_angle, eta = eta, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func)
     level_curve_type = 'LL'
     # lower bound of the second coordinate
     L2 = 0
   } else if (region$type == 'strip'){
-    print('strip')
+
     boundary_path = region_strip(theta_0 = region$base_theta, lower_bnd = region$lower_boundary, upper_bnd = region$upper_boundary, eta = eta, direction = region$direction, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func, tau = tau)
     level_curve_type = 'LU'
     L2 = region$lower_boundary
@@ -47,6 +48,10 @@ WCP_2D_Numerical_Density = function(W_func,
   }
   
   mesh = fmesher::fm_mesh_2d(boundary = fmesher::fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width)
+  if (visual_mesh){
+    plot(mesh)
+  }
+  
   # weights on mesh
   weights = numeric()
   for (i in 1:dim(mesh$loc)[1]){

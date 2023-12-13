@@ -9,7 +9,7 @@
 #' @return A list including densities on seq_phi and a inla table
 #' @export
 #'
-WCP_1D_AR1_analytic = function(seq_phi, 
+WCP2_1D_AR1_analytic = function(seq_phi, 
                                eta,
                                n,
                                sigma,
@@ -34,7 +34,7 @@ WCP_1D_AR1_analytic = function(seq_phi,
   if (inla_table){
   # inla table
   inla.prior.table = paste0("table: ",
-                        paste(c(seq_phi, density), collapse = "")
+                        paste(c(seq_phi, log(density)), collapse = "")
   )
   return (  inla.prior.table )
   }
@@ -55,7 +55,7 @@ WCP_1D_AR1_analytic = function(seq_phi,
 #' @return A list including densities on seq_xi and a inla table
 #' @export
 #'
-WCP_1D_GPtail_analytic = function(seq_xi,
+WCP1_1D_GPtail_analytic = function(seq_xi,
                               eta,
                               inla_table = FALSE){
   
@@ -89,8 +89,14 @@ WCP_1D_GPtail_analytic = function(seq_xi,
 #' @return A list including densities on seq_tau and a inla table
 #' @export
 #'
+<<<<<<< Updated upstream
 WCP_1D_Gaussian_precision_analytic = function(
                               seq_tau,
+||||||| Stash base
+WCP_1D_Gaussian_precision_analytic = function(seq_tau,
+=======
+WCP2_1D_Gaussian_precision_analytic = function(seq_tau,
+>>>>>>> Stashed changes
                               eta,
                               inla_table = FALSE){
 
@@ -123,7 +129,13 @@ WCP_1D_Gaussian_precision_analytic = function(
 #' @return A list including densities on seq_m and a inla table
 #' @export
 #'
+<<<<<<< Updated upstream
 WCP_1D_Gaussian_mean_analytic = function(seq_m,
+||||||| Stash base
+WCP_1D_Gaussian_precision_analytic = function(seq_m,
+=======
+WCP2_1D_Gaussian_mean_analytic = function(seq_m,
+>>>>>>> Stashed changes
                                               eta,
                                               inla_table = FALSE){
   

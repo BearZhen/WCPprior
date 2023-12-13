@@ -13,8 +13,16 @@ WCP_2D_Numerical_Density(
   cutoff = 0.01,
   region = list(type = "conic", lower_angle = 0, upper_angle = pi, base_theta = c(0, 0)),
   lc_multiplier = 20,
+<<<<<<< Updated upstream
   parallel = FALSE,
   NumCores = parallel::detectCores() - 1
+||||||| Stash base
+  NumCores
+=======
+  parallel = FALSE,
+  NumCores = parallel::detectCores() - 1,
+  visual_mesh = FALSE
+>>>>>>> Stashed changes
 )
 }
 \arguments{
@@ -37,6 +45,8 @@ WCP_2D_Numerical_Density(
 \item{parallel}{A logic value that indicating whether the user wants to run the function with multiple cpu.}
 
 \item{NumCores}{Number of cores to run the function.}
+
+\item{visual_mesh}{A logic value to determin whether to plot the mesh.}
 }
 \value{
 A list of density locations, densities evaluated on those locations and other utilities that can help access accuracy.

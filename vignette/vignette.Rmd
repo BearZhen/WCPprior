@@ -1,0 +1,273 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+In this vignette, we will show how to use the WCPprior package to obtain 1D and 2D numerical and analytic WCP prior.
+
+Import relevant libraries.
+```{r}
+library(WCPprior)
+library(ggplot2)
+```
+
+
+## An example with numerical approximation of bivariate WCP$_2$ prior of mean and standard deviation of Gaussian distribution.
+
+The theoretical details of deriving bivariate WCP prior density can be found on Recipe 1, Section 4.2 from https://arxiv.org/pdf/2312.04481.pdf, and its implementation details
+can be found on Recipe 4, Section 5.2 from the same document.
+
+The function that gives numerical approximation of bivariate WCP prior requires some information.\
+(1), A function that takes values of the two-dimensional parameter $\boldsymbol{\theta} = (\theta_1, \theta_2)$ and returns the Wasserstein distance $W(\boldsymbol{\theta})$.\
+(2), $\eta$, the user-specified hyperparameter for WCP prior.\
+(3), cutoff parameter that determines upper bound of the Wasserstein distance $W$ in case of the parameter space $\boldsymbol{\theta}$ is unbounded. 
+That is, by solving $P(W > w) = \text{cutoff}$, the upper bound $w = -log(\text{cutoff})/\eta$. Thus, we can approximate the WCP prior on a bounded domain.\
+(4), region information that specifies boundary of the bounded domain of $\boldsymbol{\theta}$ determined by cutoff, type of shape of the domain.\
+(5), mesh width that determine how fine the mesh is on the bounded domain.\
+
+The following code performs the approximation.
+```{r}
+# the Wasserstein distance function, where x[1] is the mean parameter, x[2] is the standard deviation parameter.
+W_func <- function(x){sqrt(x[1]^2+x[2]^2)}
+# user-specified hyperparameter
+eta = 1
+# cutoff parameter
+cutoff = 0.01
+# region information, type of region is conic, range of the angle of the conic region is from 0 to pi and the base model parameter is (0,0)
+region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0))
+# mesh width
+mesh_width = 0.5
+
+# call the function to compute numerical approximation of the WCP prior.
+# By setting parallel = TRUE, user can run the function with multiple cores and NumCores specifies number of cores.
+# By setting visual_mesh = TRUE, 
+result = WCP_2D_Numerical_Density(W_func,
+                          eta = 1,
+                          mesh_width = 0.4, 
+                          cutoff = 0.01, 
+                          region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
+                          parallel = TRUE,
+                          NumCores = 3,
+                          visual_mesh = TRUE)
+```
+
+Now we show the approximated density.
+```{r}
+# extract (theta1, theta2) where the approximated density defines on
+density_location = result[[1]]
+# extract approximated density
+approx_WCP_density = result[[2]]
+
+data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector(approx_WCP_density))
+data = data.frame(data)
+g = ggplot(data, aes(X1, X2, color = X3))+
+  geom_point(size = 0.1)+
+  scale_color_gradient(low="blue", high="red") +
+  labs(x = expression(theta[1]), y = expression(theta[2])) + 
+  guides(col = guide_colourbar(title = "Density"))+
+  theme(legend.position = "top",
+        legend.key.height = unit(0.1, 'cm'), #change legend key height
+        legend.key.width = unit(0.5, 'cm'), #change legend key width
+        legend.title = element_text(size=7), #change legend title font size
+        legend.text = element_text(size=5),#change legend text font size
+        axis.text=element_text(size=7),
+        axis.title=element_text(size=7)) 
+g
+```
+
+Now we show the absolute error between the true and the approximated densities. 
+```{r}
+# compute the true density
+true_WCP_density = ( 1/sqrt(density_location[,1]^2 + density_location[,2]^2) ) * eta * exp(-eta * sqrt(density_location[,1]^2 + density_location[,2]^2))/pi
+
+data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector(abs( approx_WCP_density - true_WCP_density    )))
+data = data.frame(data)
+g = ggplot(data, aes(X1, X2, color = X3))+
+  geom_point(size = 0.1)+
+  scale_color_gradient(low="blue", high="red") +
+  labs(x = expression(theta[1]), y = expression(theta[2])) + 
+  guides(col = guide_colourbar(title = "Density"))+
+  theme(legend.position = "top",
+        legend.key.height = unit(0.1, 'cm'), #change legend key height
+        legend.key.width = unit(0.5, 'cm'), #change legend key width
+        legend.title = element_text(size=7), #change legend title font size
+        legend.text = element_text(size=5),#change legend text font size
+        axis.text=element_text(size=7),
+        axis.title=element_text(size=7)) 
+g
+```
+To compute the total variation distance between the true and approximated distribution, we can do the following:
+```{r}
+# mass lump matrix of the mesh
+mass_lump_C = result[[3]]
+# projection matrix that maps from density_location to mesh nodes.
+A_new = result[[4]]
+# total variation distance
+TVD_error = 0.5 * (sum(mass_lump_C %*% abs(A_new %*% matrix(approx_WCP_density,ncol = 1) - A_new %*% matrix(true_WCP_density,ncol = 1))) + cutoff)
+print(TVD_error)
+```
+
+Our package also provides a function to compute point-wise analytic bivariate WCP$_2$ prior of mean and standard deviation of Gaussian distribution. To use this function, users just need to provide values of parameters, $\eta$ and base model mean parameter $\text{base_mean}$. The base model standard deviation parameter is fixed to 0. Now we use this function to compute the densities on all the coordinates where the numerical approximation densities are computed.
+```{r}
+
+analytic_density = numeric()
+
+for (i in 1:length(density_location[,1])){
+  analytic_density[i] = WCP2_2D_Gaussian_analytic(mean = density_location[i,1], 
+                                      std = density_location[i,2],
+                                      eta = 1,
+                                      base_mean = 0)
+}
+# compare this result with the true density. They should agree
+print(sum(abs(true_WCP_density - analytic_density)))
+# plot the result
+data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector( analytic_density ))
+data = data.frame(data)
+g = ggplot(data, aes(X1, X2, color = X3))+
+  geom_point(size = 0.1)+
+  scale_color_gradient(low="blue", high="red") +
+  labs(x = expression(theta[1]), y = expression(theta[2])) + 
+  guides(col = guide_colourbar(title = "Density"))+
+  theme(legend.position = "top",
+        legend.key.height = unit(0.1, 'cm'), #change legend key height
+        legend.key.width = unit(0.5, 'cm'), #change legend key width
+        legend.title = element_text(size=7), #change legend title font size
+        legend.text = element_text(size=5),#change legend text font size
+        axis.text=element_text(size=7),
+        axis.title=element_text(size=7)) 
+g
+
+```
+
+
+
+## An example with numerical approximation of 1d WCP$_2$ prior of reciprocal of degree of freedom parameter of t-distribution.
+
+The theoretical implementation details of WCP$_2$ prior of reciprocal of degree of freedom parameter of t-distribution can be found at 
+Section 5.1 from https://arxiv.org/pdf/2312.04481.pdf. Let $\xi$ denote the parameter of interest. To use our function to construct numerical approximation of WCP prior of a single parameter, users need to provide the following information in general:\
+(1), A function that takes values of the two-dimensional parameter $\theta$ and returns the Wasserstein distance $W(\theta)$.\
+(2), $\theta_0$, the base model parameter.
+(3), $\eta$, the user-specified hyperparameter for WCP prior.\
+(4), cutoff parameter. \
+(5), Lower and upper bound of the domain of $\theta$ and if the two values are included or not.\
+
+Since $\xi\in[0,1/2)$ is a bounded domain, we do not need to provide the cutoff parameter in this case. Also, an analytic expression of $W(\xi)$ is not available in our case, we have to compute it numerically by numerical integration (see Remark 1 from https://arxiv.org/pdf/2312.04481.pdf). 
+```{r}
+library(fGarch)
+# The Wasserstein distance function by numerical integration
+W2distanceGt = function(xi){
+  # xi is 1/nu where nu is dof of t-distribution
+  integrand = function(p,...){
+    abs(qstd(p,...) - qnorm(p))^2
+  }
+  integral = integrate(Vectorize(integrand),0,1, nu = 1/xi,subdivisions = 10000L)$value
+  return (integral^(1/2))
+}
+
+```
+
+However, to call the above function frequently is not economic, we construct an interpolated function for $W(\xi)$ by the following code.
+```{r}
+# a sequence of xi
+Xi = seq(from = 0.01,to = 0.49,by = 0.01)
+# obtain a sequence of W(xi) by W2distanceGt function
+W2distance = c()
+xi = c()
+for (i in 1:length(Xi)){
+  # skip the case of problematic numerical integration
+  temp = try(W2distanceGt(Xi[i]), silent = FALSE)
+  if ('try-error' %in% class(temp)){
+    next
+  }
+  W2distance = c(W2distance, W2distanceGt(Xi[i]) )
+  xi = c(xi, Xi[i])
+}
+# the interpolated function of W(xi)
+W2d = splinefun(xi, W2distance, method = "hyman")
+```
+
+We determine $\eta$ by requiring $P(\text{W}(\xi) > U) = \alpha$.
+```{r}
+alpha = 0.3
+U = 0.1
+eta = -log(alpha)/W2d(U)
+```
+
+Now we are ready to call the function to compute numerically approximated WCP prior. $\text{base_theta}$ is the base model parameter. $\text{L}$ and $\text{U}$ denote lower and upper bound of $\theta$. $\text{L_included}$ and $\text{U_included}$ indicate if $\text{L}$ and $\text{U}$ should be included into the interval of the parameter of interest. $\text{mesh_width}$ denote mesh width of the domain. User may instead input $\text{mesh_n}$ which specifies number of mesh nodes to determine the mesh.
+```{r}
+result = WCP_1D_Numerical_Density(base_theta = 0,
+                                   L = 0, 
+                                   L_included = TRUE,
+                                   U = 0.5,
+                                   U_included = FALSE,
+                                   W_func = W2d,
+                                   eta = eta,
+                                   mesh_width = 0.001)
+```
+
+The output contains a vector of values of $\xi$ and a vector approximated densities evaluated at those $\xi$. The visualization of the result is:
+```{r}
+plot(result[,1], result[,2 ],type="l",xlab="xi", ylab="density")
+```
+
+## Using WCP prior in R-INLA
+
+Our package allows user to provide WCP prior with a form that R-INLA software can use. Here we give an example with WCP$_2$ prior for $\phi$ of stationary AR(1) process. The model setup and theoretical details can be found at Section 3.1 from https://arxiv.org/pdf/2312.04481.pdf. We will generate the WCP$_2$ prior by its analytic expression. Functions that encode analytic expression of WCP priors in our package have similar usage. For univariate prior, functions take a sequence of values of parameter of interests and for bivariate priors, functions take one pair of values of the two parameters. If users set the argument 'inla_table' be TRUE, then the function will output the prior in the format that R-INLA can use.
+```{r}
+# import INLA
+library(INLA)
+
+# length of the AR1 process
+n = 10
+# standard deviation of the process
+sigma = 0.1
+# value of phi
+phi = 0.2
+# simulate the process
+sim_data = numeric(n)
+sim_data[1] = rnorm(1,mean = 0, sd = sigma)
+for (i in 2:n){
+ sim_data[i] = phi*sim_data[i-1] + rnorm(1, mean = 0, sd = sigma*sqrt(1-phi^2) )
+}
+data = data.frame(y = sim_data, t = 1:n)
+# create a sequence of values of phi
+seq_phi = seq(from = -1, to = 0.99, by = 0.01)
+# call the function and set inla_table = TRUE so that the function will return a prior that can be used by INLA
+WCP2_prior_table = WCP2_1D_AR1_analytic (seq_phi = seq_phi, 
+                               eta = 7,
+                               n = 13,
+                               sigma = sigma,
+                               inla_table = TRUE)
+# INLA formula
+formula = y~ -1+f(t,model='ar1',hyper = WCP2_prior_table)
+family = "Gaussian"
+# fit the model by INLA
+result = inla(formula=formula, data = data, family=family,
+             control.predictor = list(compute=T))
+summary(result)
+# visualize the result
+plot(data$y, col="blue",
+     ylab="fitting result")
+lines(result$summary.random$t[ ,"mean"])
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

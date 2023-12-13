@@ -8,7 +8,7 @@
 #' @return A value of density evaluated at c(mean, std).
 #' @export
 #'
-WCP_2D_Gaussian_analytic = function(mean, 
+WCP2_2D_Gaussian_analytic = function(mean, 
                                       std,
                                       eta,
                                       base_mean){
@@ -33,7 +33,7 @@ WCP_2D_Gaussian_analytic = function(mean,
 #' @return A value of density evaluated at c(sigma, xi).
 #' @export
 #'
-WCP_2D_GP_analytic = function(sigma, 
+WCP1_2D_GP_analytic = function(sigma, 
                                  xi,
                                 eta){
   if (sigma < 0 ) {
