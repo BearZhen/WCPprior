@@ -10,6 +10,8 @@ WCP2_1D_Gaussian_mean_analytic(seq_m, eta, inla_table = FALSE)
 \item{seq_m}{A vector of values of mean parameter.}
 
 \item{eta}{User specified parameter of the WCP prior.}
+
+\item{inla_table}{Should the results be returned as a table to be used in INLA? Default is FALSE.}
 }
 \value{
 A list including densities on seq_m and a inla table

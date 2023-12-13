@@ -4,32 +4,14 @@
 \alias{WCP2_1D_Gaussian_precision_analytic}
 \title{The 1d analytic density WCP2 prior for tau (1/variance) of Gaussian distribution}
 \usage{
-<<<<<<< Updated upstream:man/WCP_1D_Gaussian_precision_analytic.Rd
-WCP_1D_Gaussian_precision_analytic(seq_tau, eta, inla_table = FALSE)
-||||||| Stash base:man/WCP_1D_Gaussian_precision_analytic.Rd
-WCP_1D_Gaussian_precision_analytic(seq_tau, eta)
-=======
 WCP2_1D_Gaussian_precision_analytic(seq_tau, eta, inla_table = FALSE)
->>>>>>> Stashed changes:man/WCP2_1D_Gaussian_precision_analytic.Rd
 }
 \arguments{
-<<<<<<< Updated upstream:man/WCP_1D_Gaussian_precision_analytic.Rd
 \item{seq_tau}{A vector of values of tau parameter.}
 
 \item{eta}{User specified parameter of the WCP prior.}
-||||||| Stash base:man/WCP_1D_Gaussian_precision_analytic.Rd
-\item{eta}{User specified parameter of the WCP prior.}
-=======
-\item{seq_tau}{A vector of values of tau parameter.}
->>>>>>> Stashed changes:man/WCP2_1D_Gaussian_precision_analytic.Rd
 
-<<<<<<< Updated upstream:man/WCP_1D_Gaussian_precision_analytic.Rd
 \item{inla_table}{Should the results be returned as a table to be used in INLA? Default is FALSE.}
-||||||| Stash base:man/WCP_1D_Gaussian_precision_analytic.Rd
-\item{seq_xi}{A vector of values of xi parameter.}
-=======
-\item{eta}{User specified parameter of the WCP prior.}
->>>>>>> Stashed changes:man/WCP2_1D_Gaussian_precision_analytic.Rd
 }
 \value{
 A list including densities on seq_tau and a inla table
