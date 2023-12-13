@@ -15,5 +15,5 @@ LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 Suggests: 
-    testthat (>= 3.0.0), fmesher, sp, excursions, doParallel
+    testthat (>= 3.0.0), fmesher, sp, excursions, doParallel, fGarch
 Config/testthat/edition: 3

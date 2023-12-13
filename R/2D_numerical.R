@@ -203,16 +203,12 @@ WCP_2D_Numerical_Density = function(W_func,
   A = PD_util_P$A
   # find the mesh nodes whose element does not contain any level curve points
   idx_problem <- which(Matrix::colSums(A)==0)
-  print("length")
-  print(length(idx_problem))
   jitter = 0
   while(length(idx_problem)>0){
-    #print("having holes")
     new_loc <- mesh$loc[idx_problem, , drop=FALSE]
     new_W <- W_func( c(new_loc[,1], new_loc[,2])) + jitter
     if (parallel == TRUE){
     results_additional <- foreach::foreach (W = new_W) %dopar% {
-      #print(W)
       levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
                                  levels = W)$contour 
       # skip if there is no such level curve
@@ -308,7 +304,6 @@ WCP_2D_Numerical_Density = function(W_func,
     A = PD_util_P$A
     idx_problem <- which(colSums(A)==0)
     jitter <- abs(stats::rnorm(1, mean = mesh_width/10, sd = mesh_width/10))
-    print("Adding more levels")
   }
   
   ########################### compute partial derivatives of partial arc length and the Wasserstein distance #########
