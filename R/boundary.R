@@ -86,14 +86,16 @@ pathfind_conic <- function(phi_l, phi_r, s, epsilon, w, epsilon_tilde, W_p, maxi
 # mesh = fm_mesh_2d(boundary = fm_segm( reg, is.bnd = TRUE), max.edge = 0.1, cutoff = 0.01)
 # plot(mesh)
 
-region_conic <- function(theta_0, phi_l = 0, phi_r, eta, s = 1, epsilon, epsilon_tilde = epsilon, delta, tau = epsilon/1000, W_p, maxit = 1000, return_list = FALSE){
+region_conic <- function(theta_0, phi_l = 0, phi_r, eta, s = 1, epsilon, epsilon_tilde = epsilon, delta, tau = epsilon/1000, W_p, maxit = 1000, buff_boundary = FALSE, return_list = FALSE){
     w_up <- -log(delta/2)/eta
     w_lwr <- -log(1-(delta+tau)/2)/eta + W_p(theta_0 + tau * c(cos((phi_r + phi_l)/2), sin((phi_r+phi_l)/2)))
-    theta <- pathfind_conic(phi_l = phi_l, phi_r = phi_r, s = s, epsilon = epsilon, w = w_up, epsilon_tilde =  epsilon_tilde, W_p = W_p, maxit = maxit, buff = tau/10)
-    theta_small <- pathfind_conic(phi_l = phi_l, phi_r = phi_r, s = s, epsilon = epsilon/10, w = w_lwr, epsilon_tilde =  epsilon_tilde/100, W_p = W_p, maxit = maxit, buff = tau/10)
+    theta <- pathfind_conic(phi_l = phi_l, phi_r = phi_r, s = s, epsilon = epsilon, w = w_up, epsilon_tilde =  epsilon_tilde, W_p = W_p, maxit = maxit, buff = tau)
+    theta_small <- pathfind_conic(phi_l = phi_l, phi_r = phi_r, s = s, epsilon = epsilon/10, w = w_lwr, epsilon_tilde =  epsilon_tilde/100, W_p = W_p, maxit = maxit, buff = tau)
     theta_small <- theta_small[nrow(theta_small):1,]
 
-    theta <- cut_boundary(theta = theta, tau = tau)
+    if(buff_boundary){
+        theta <- cut_boundary(theta = theta, tau = tau)
+    }
 
     boundary = rbind(theta, theta_small)
 
@@ -204,7 +206,7 @@ pathfind_strip <- function(start, lower_bnd, upper_bnd, type = "h", direction = 
 # mesh = fm_mesh_2d(boundary = fm_segm( reg, is.bnd = TRUE), max.edge = 0.1, cutoff = 0.01)
 # plot(mesh)
 
-region_strip <- function(theta_0, lower_bnd = 0, upper_bnd, eta, type = "h", direction = "positive", s = 1, epsilon, epsilon_tilde = epsilon, delta, tau = epsilon/1000, W_p, maxit = 1000, return_list = FALSE){
+region_strip <- function(theta_0, lower_bnd = 0, upper_bnd, eta, type = "h", direction = "positive", s = 1, epsilon, epsilon_tilde = epsilon, delta, tau = epsilon/1000, W_p, maxit = 1000, buff_boundary = FALSE, return_list = FALSE){
     if(type == "h"){
         v <- c(theta_0[1], (lower_bnd + upper_bnd)/2 + tau)
         start <- theta_0[1]
@@ -226,14 +228,16 @@ region_strip <- function(theta_0, lower_bnd = 0, upper_bnd, eta, type = "h", dir
         theta_neg <- pathfind_strip(start = start, lower_bnd = lower_bnd, upper_bnd = upper_bnd, type = type, direction = "negative", s = s, epsilon = epsilon, w = w_up, epsilon_tilde =  epsilon_tilde, W_p = W_p, maxit = maxit, buff = tau/10)
     }
     
-    if(direction != "both"){
-        theta <- cut_boundary(theta = theta, tau = tau)
-        theta_small <- cut_boundary(theta = theta_small, tau = tau)
-    } else{
-        theta_pos <- cut_boundary(theta = theta_pos, tau = tau)
-        theta_small_pos <- cut_boundary(theta = theta_small_pos, tau = tau)
-        theta_neg <- cut_boundary(theta = theta_neg, tau = tau)
-        theta_small_neg <- cut_boundary(theta = theta_small_neg, tau = tau)
+    if(buff_boundary){
+        if(direction != "both"){
+            theta <- cut_boundary(theta = theta, tau = tau)
+            theta_small <- cut_boundary(theta = theta_small, tau = tau)
+        } else{
+            theta_pos <- cut_boundary(theta = theta_pos, tau = tau)
+            theta_small_pos <- cut_boundary(theta = theta_small_pos, tau = tau)
+            theta_neg <- cut_boundary(theta = theta_neg, tau = tau)
+            theta_small_neg <- cut_boundary(theta = theta_small_neg, tau = tau)
+        }
     }
 
     if(direction == "negative"){

@@ -88,7 +88,7 @@ pxl$val <-
       dens_mesh)
 ```
 
-Let us now plot the approximated density:
+Let us now plot the approximated density in log scale:
 
 ```{r}
 library(viridis)
@@ -96,7 +96,7 @@ library(viridis)
  ggplot() +
     geom_tile(
       data = pxl,
-      aes(geometry = geometry, fill = val),
+      aes(geometry = geometry, fill = log(val)),
       stat = "sf_coordinates"
     ) + scale_fill_viridis() 
 ```
@@ -118,11 +118,13 @@ We can now add the absolute errors at the `pxl` list:
 pxl$error <- abs(pxl$val - true_WCP_density)
 ```
 
+Now, the error plot in log scale:
+
 ```{r}
  ggplot() +
     geom_tile(
       data = pxl,
-      aes(geometry = geometry, fill = error),
+      aes(geometry = geometry, fill = log(error)),
       stat = "sf_coordinates"
     ) + scale_fill_viridis() 
 ```
