@@ -15,6 +15,7 @@ Our package allows user to provide WCP prior with a form that R-INLA software ca
 We first simulate a stationary AR(1) process with length 10, standard deviation 0.1 and $\phi = 0.2$.
 ```{r}
 # import INLA
+library(WCPprior)
 library(INLA)
 
 # length of the AR1 process

@@ -23,6 +23,8 @@ navbar:
       menu:
       - text: Numerical approximations of WCP priors
         href: articles/numerical_WCP.html
+      - text: Bridge to R-INLA and Stan
+        href: articles/INLA_and_Stan_utilities.html
 
 home:
   links:
