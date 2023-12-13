@@ -58,7 +58,7 @@ result = WCP_2D_Numerical_Density(W_func,
                           cutoff = cutoff, 
                           region = region,
                           parallel = TRUE,
-                          NumCores = 3,
+                          NumCores = 2,
                           visual_mesh = TRUE)
 ```
 
