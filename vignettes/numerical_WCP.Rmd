@@ -90,7 +90,7 @@ pxl$val <-
 
 Let us now plot the approximated density in log scale:
 
-```{r}
+```{r, message=FALSE}
 library(viridis)
 
  ggplot() +
@@ -102,7 +102,7 @@ library(viridis)
 ```
 
 Now we show the absolute error between the true and the approximated densities. We begin by obtaining the values of the true density at the pixelated locations:
-```{r}
+```{r, message=FALSE}
 library(sf)
 coord_pxl <- st_coordinates(pxl)
 # compute the true density
@@ -208,7 +208,7 @@ Section 5.1 from https://arxiv.org/pdf/2312.04481.pdf. Let $\xi$ denote the para
 (5), Lower and upper bound of the domain of $\theta$ and if the two values are included or not.\
 
 Since $\xi\in[0,1/2)$ is a bounded domain, we do not need to provide the cutoff parameter in this case. Also, an analytic expression of $W(\xi)$ is not available in our case, we have to compute it numerically by numerical integration (see Remark 1 from https://arxiv.org/pdf/2312.04481.pdf). 
-```{r}
+```{r, message=FALSE}
 library(fGarch)
 # The Wasserstein distance function by numerical integration
 W2distanceGt = function(xi){
