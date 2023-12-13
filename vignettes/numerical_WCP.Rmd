@@ -179,7 +179,7 @@ data = cbind(as.vector(coord_pxl[,1]),
           as.vector(coord_pxl[,2]),
           as.vector(analytic_density))
 data = data.frame(data)
-g = ggplot(data, aes(X1, X2, fill = X3))+
+g = ggplot(data, aes(X1, X2, fill = log(X3)))+
   geom_raster()+
   scale_fill_viridis() +
   labs(x = expression(theta[1]), y = expression(theta[2])) + 
