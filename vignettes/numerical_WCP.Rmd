@@ -2,6 +2,10 @@
 title: "Numerical approximations of WCP priors"
 date: "Created: 2023-12-13. Last modified: `r Sys.Date()`."
 output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Numerical approximations of WCP priors}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 
@@ -27,107 +31,157 @@ That is, by solving $P(W > w) = \text{cutoff}$, the upper bound $w = -log(\text{
 (4), region information that specifies boundary of the bounded domain of $\boldsymbol{\theta}$ determined by cutoff, type of shape of the domain.\
 (5), mesh width that determine how fine the mesh is on the bounded domain.\
 
-The following code performs the approximation.
+Let us define the Wasserstein distance function, where `x[1]` is the mean parameter, `x[2]` is the standard deviation parameter:
 ```{r}
-# the Wasserstein distance function, where x[1] is the mean parameter, x[2] is the standard deviation parameter.
 W_func <- function(x){sqrt(x[1]^2+x[2]^2)}
+```
+
+We now define the parameters and the region:
+```{r}
+cutoff = 0.01
+mesh_width = 0.3
 # user-specified hyperparameter
 eta = 1
-# cutoff parameter
-cutoff = 0.01
-# region information, type of region is conic, range of the angle of the conic region is from 0 to pi and the base model parameter is (0,0)
-region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0))
-# mesh width
-mesh_width = 0.5
 
-# call the function to compute numerical approximation of the WCP prior.
-# By setting parallel = TRUE, user can run the function with multiple cores and NumCores specifies number of cores.
-# By setting visual_mesh = TRUE, 
+region = list(type = 'conic', lower_angle = 0, 
+upper_angle = pi, base_theta = c(0,0))
+```
+Observe that the type of region is `conic`, the range of the angle of the conic region is from 0 to $\pi$ and the base model parameter is `(0,0)`.
+
+The following code performs the approximation by using the `WCP_2D_Numerical_Density()` function. By setting `parallel = TRUE`, user can run the function with multiple cores and `NumCores` specifies number of cores. We will set `visual_mesh = TRUE` to obtain a plot of the region along with the constructed mesh.
+
+```{r, warning=FALSE}
 result = WCP_2D_Numerical_Density(W_func,
-                          eta = 1,
-                          mesh_width = 0.4, 
-                          cutoff = 0.01, 
-                          region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
+                          eta = eta,
+                          mesh_width = mesh_width, 
+                          cutoff = cutoff, 
+                          region = region,
                           parallel = TRUE,
                           NumCores = 3,
                           visual_mesh = TRUE)
 ```
 
-Now we show the approximated density.
-```{r}
-# extract (theta1, theta2) where the approximated density defines on
-density_location = result[[1]]
-# extract approximated density
-approx_WCP_density = result[[2]]
+This function returns the values of the approximated density along the level curves.
+Our goal now is to plot the approximated density. To this end, we will obtain the approximated values at the mesh, then plot its values on a pixelated cover of the mesh.
 
-data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector(approx_WCP_density))
-data = data.frame(data)
-g = ggplot(data, aes(X1, X2, color = X3))+
-  geom_point(size = 0.1)+
-  scale_color_gradient(low="blue", high="red") +
-  labs(x = expression(theta[1]), y = expression(theta[2])) + 
-  guides(col = guide_colourbar(title = "Density"))+
-  theme(legend.position = "top",
-        legend.key.height = unit(0.1, 'cm'), #change legend key height
-        legend.key.width = unit(0.5, 'cm'), #change legend key width
-        legend.title = element_text(size=7), #change legend title font size
-        legend.text = element_text(size=5),#change legend text font size
-        axis.text=element_text(size=7),
-        axis.title=element_text(size=7)) 
-g
+We begin by extracting the mesh and creating a pixelized mesh with the `fm_pixels()` function from the `fmesher` package.
+
+```{r}
+library(fmesher)
+mesh <- result$mesh
+pxl <- fm_pixels(mesh)
 ```
 
-Now we show the absolute error between the true and the approximated densities. 
+We will now obtain the values of the approximated density at the mesh nodes. To this end, we need the elements `basis` and `val` from the returned list. The `basis` contains the matrix that maps the level curve locations to the mesh nodes, and `val` contains the values of the approximated density at the level curve locations.
+
 ```{r}
+basis <- result$basis
+dens_val <- result$val 
+dens_mesh <- basis%*%dens_val
+```
+
+Let us obtain the values of the approximated density at the pixelated mesh:
+
+```{r}
+pxl$val <- 
+    fm_evaluate(mesh, pxl, field = 
+      dens_mesh)
+```
+
+Let us now plot the approximated density in log scale:
+
+```{r}
+library(viridis)
+
+ ggplot() +
+    geom_tile(
+      data = pxl,
+      aes(geometry = geometry, fill = log(val)),
+      stat = "sf_coordinates"
+    ) + scale_fill_viridis() 
+```
+
+Now we show the absolute error between the true and the approximated densities. We begin by obtaining the values of the true density at the pixelated locations:
+```{r}
+library(sf)
+coord_pxl <- st_coordinates(pxl)
 # compute the true density
-true_WCP_density = ( 1/sqrt(density_location[,1]^2 + density_location[,2]^2) ) * eta * exp(-eta * sqrt(density_location[,1]^2 + density_location[,2]^2))/pi
-
-data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector(abs( approx_WCP_density - true_WCP_density    )))
-data = data.frame(data)
-g = ggplot(data, aes(X1, X2, color = X3))+
-  geom_point(size = 0.1)+
-  scale_color_gradient(low="blue", high="red") +
-  labs(x = expression(theta[1]), y = expression(theta[2])) + 
-  guides(col = guide_colourbar(title = "Density"))+
-  theme(legend.position = "top",
-        legend.key.height = unit(0.1, 'cm'), #change legend key height
-        legend.key.width = unit(0.5, 'cm'), #change legend key width
-        legend.title = element_text(size=7), #change legend title font size
-        legend.text = element_text(size=5),#change legend text font size
-        axis.text=element_text(size=7),
-        axis.title=element_text(size=7)) 
-g
+true_WCP_density = ( 1/sqrt(coord_pxl[,1]^2 + 
+                coord_pxl[,2]^2) ) * eta * 
+                exp(-eta * sqrt(coord_pxl[,1]^2 + 
+                coord_pxl[,2]^2))/pi
 ```
-To compute the total variation distance between the true and approximated distribution, we can do the following:
+
+We can now add the absolute errors at the `pxl` list:
+
 ```{r}
-# mass lump matrix of the mesh
-mass_lump_C = result[[3]]
-# projection matrix that maps from density_location to mesh nodes.
-A_new = result[[4]]
-# total variation distance
-TVD_error = 0.5 * (sum(mass_lump_C %*% abs(A_new %*% matrix(approx_WCP_density,ncol = 1) - A_new %*% matrix(true_WCP_density,ncol = 1))) + cutoff)
+pxl$error <- abs(pxl$val - true_WCP_density)
+```
+
+Now, the error plot in log scale:
+
+```{r}
+ ggplot() +
+    geom_tile(
+      data = pxl,
+      aes(geometry = geometry, fill = log(error)),
+      stat = "sf_coordinates"
+    ) + scale_fill_viridis() 
+```
+
+To compute the total variation distance between the true and approximated distribution, we can do the following. We start by obtainig the lumped mass matrix, which is a matrix that contains the areas of the triangles of the mesh:
+```{r}
+mass_lump_C <- result$C
+```
+Let us now obtain the value of the true density at the mesh locations:
+```{r}
+true_WCP_density_mesh = ( 1/sqrt(mesh$loc[,1]^2 + 
+                mesh$loc[,2]^2) ) * eta * 
+                exp(-eta * sqrt(mesh$loc[,1]^2 + 
+                mesh$loc[,2]^2))/pi
+```
+
+We can now compute the approximation of the total variation norm:
+```{r}
+TVD_error = 0.5 * (sum(mass_lump_C %*% 
+      abs(matrix(dens_mesh,ncol = 1) - 
+        matrix(true_WCP_density_mesh,ncol = 1))) + 
+        cutoff)
 print(TVD_error)
 ```
 
 Our package also provides a function to compute point-wise analytic bivariate WCP$_2$ prior of mean and standard deviation of Gaussian distribution. To use this function, users just need to provide values of parameters, $\eta$ and base model mean parameter $\text{base_mean}$. The base model standard deviation parameter is fixed to 0. Now we use this function to compute the densities on all the coordinates where the numerical approximation densities are computed.
-```{r}
 
+Let us start by obtaining the analytic density with the help of the `WCP2_2D_Gaussian_analytic()` function
+
+```{r}
 analytic_density = numeric()
 
-for (i in 1:length(density_location[,1])){
-  analytic_density[i] = WCP2_2D_Gaussian_analytic(mean = density_location[i,1], 
-                                      std = density_location[i,2],
-                                      eta = 1,
-                                      base_mean = 0)
+for (i in 1:length(coord_pxl[,1])){
+  analytic_density[i] = 
+            WCP2_2D_Gaussian_analytic(mean = 
+                      coord_pxl[i,1], 
+                      std = coord_pxl[i,2],
+                      eta = 1,
+                      base_mean = 0)
 }
-# compare this result with the true density. They should agree
+```
+
+Let us now compare the above density with the true density we computed manually:
+```{r}
 print(sum(abs(true_WCP_density - analytic_density)))
-# plot the result
-data = cbind(as.vector(density_location[,1]),as.vector(density_location[,2]),as.vector( analytic_density ))
+```
+
+We will now plot the analytic density:
+
+```{r}
+data = cbind(as.vector(coord_pxl[,1]),
+          as.vector(coord_pxl[,2]),
+          as.vector(analytic_density))
 data = data.frame(data)
-g = ggplot(data, aes(X1, X2, color = X3))+
-  geom_point(size = 0.1)+
-  scale_color_gradient(low="blue", high="red") +
+g = ggplot(data, aes(X1, X2, fill = X3))+
+  geom_raster()+
+  scale_fill_viridis() +
   labs(x = expression(theta[1]), y = expression(theta[2])) + 
   guides(col = guide_colourbar(title = "Density"))+
   theme(legend.position = "top",
@@ -162,7 +216,8 @@ W2distanceGt = function(xi){
   integrand = function(p,...){
     abs(qstd(p,...) - qnorm(p))^2
   }
-  integral = integrate(Vectorize(integrand),0,1, nu = 1/xi,subdivisions = 10000L)$value
+  integral = integrate(Vectorize(integrand),0,1, 
+      nu = 1/xi,subdivisions = 10000L)$value
   return (integral^(1/2))
 }
 
@@ -209,23 +264,8 @@ result = WCP_1D_Numerical_Density(base_theta = 0,
 
 The output contains a vector of values of $\xi$ and a vector approximated densities evaluated at those $\xi$. The visualization of the result is:
 ```{r}
-plot(result[,1], result[,2 ],type="l",xlab="xi", ylab="density")
+data <- data.frame(x = result[,1], density = result[, 2])
+ggplot(data, aes(x = x, y = density)) + geom_line()
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

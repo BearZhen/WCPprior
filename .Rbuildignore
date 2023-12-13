@@ -14,3 +14,4 @@ examples
 ^shiny_app$
 ^.vscode$
 ^deprecated$
+^vignettes/*.html$

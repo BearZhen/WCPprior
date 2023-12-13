@@ -1,0 +1,51 @@
+url: https://vpnsctl.github.io/WCPprior/
+
+destination: docs
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  theme: arrow-light
+  bslib:
+    heading_font: {google: "Roboto Slab"}
+
+navbar:
+  bg: primary
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    reference:
+      text: Functions
+      href: reference/index.html
+    articles:
+      text: Vignettes
+      menu:
+      - text: Numerical approximations of WCP priors
+        href: articles/numerical_WCP.html
+
+home:
+  links:
+  - text: Our research group
+    href: http://stochproc.kaust.edu.sa/
+   
+    
+reference:
+  - title: WCPprior package
+    contents: 
+    - WCPprior
+  - title: Analytical WCP priors
+    contents:
+    - WCP2_1D_Gaussian_mean_analytic
+    - WCP2_1D_Gaussian_precision_analytic
+    - WCP1_1D_GPtail_analytic
+    - WCP2_1D_AR1_analytic
+    - WCP2_2D_Gaussian_analytic
+    - WCP1_2D_GP_analytic
+  - title: Numerical approximation of WCP priors
+    contents:    
+    - WCP_1D_Numerical_Density
+    - WCP_2D_Numerical_Density
+  - title: Auxiliary functions
+    contents:
+    - compute_partial_arc_lengths

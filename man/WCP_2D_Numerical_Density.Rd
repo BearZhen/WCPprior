@@ -13,6 +13,7 @@ WCP_2D_Numerical_Density(
   cutoff = 0.01,
   region = list(type = "conic", lower_angle = 0, upper_angle = pi, base_theta = c(0, 0)),
   lc_multiplier = 20,
+  buff_boundary = FALSE,
   parallel = FALSE,
   NumCores = parallel::detectCores() - 1,
   visual_mesh = FALSE
@@ -34,6 +35,8 @@ WCP_2D_Numerical_Density(
 \item{region}{A list that specify region information. For example, for strip regions (regions of the type IxJ, where I = (a,b) and J = (c,d) are intervals, with one of them being unbounded), one can set `region = list(type = "strip", base_theta = c(a,c), corners = c(a,b,c,d))`, where some of the values `a`,`b`,`c` or `d` can be `-Inf` or `Inf`. If the type is conic, the list must be set, for example, as list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)), where `lower_angle` and `upper_angle` contains the smaller and larger angles that determine the cone.}
 
 \item{lc_multiplier}{Multiplier determines number of level curves}
+
+\item{buff_boundary}{Should an additional buffer (of the magnitude of mesh_width) be added to the region to bound it away from the boundary of the domain?}
 
 \item{parallel}{A logic value that indicating whether the user wants to run the function with multiple cpu.}
 

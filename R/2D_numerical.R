@@ -10,6 +10,7 @@
 #' @param eta User specified parameter of the WCP prior.
 #' @param parallel A logic value that indicating whether the user wants to run the function with multiple cpu.
 #' @param lc_multiplier Multiplier determines number of level curves
+#' @param buff_boundary Should an additional buffer (of the magnitude of mesh_width) be added to the region to bound it away from the boundary of the domain?
 #' @param NumCores Number of cores to run the function.
 #' @param visual_mesh A logic value to determin whether to plot the mesh.
 #'
@@ -25,6 +26,8 @@ WCP_2D_Numerical_Density = function(W_func,
                           region = list(type = 'conic', lower_angle = 0, upper_angle = pi, base_theta = c(0,0)),
                           #region = list(type = 'strip', corner = c(l1,u1,l2,u2), base_theta = c(0,0))
                           lc_multiplier = 20,
+                          buff_boundary = FALSE,
+
                           parallel = FALSE,
                           NumCores = parallel::detectCores()-1,
                           visual_mesh = FALSE) {
@@ -34,7 +37,7 @@ WCP_2D_Numerical_Density = function(W_func,
   if (region$type == 'conic'){
     # boundary path
 
-    boundary_path = region_conic(theta_0 = region$base_theta, phi_l = region$lower_angle, phi_r = region$upper_angle, eta = eta, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func)
+    boundary_path = region_conic(theta_0 = region$base_theta, phi_l = region$lower_angle, phi_r = region$upper_angle, eta = eta, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func, buff_boundary = buff_boundary)
     level_curve_type = 'LL'
     # lower bound of the second coordinate
     
@@ -72,7 +75,7 @@ WCP_2D_Numerical_Density = function(W_func,
       
     }
     
-    boundary_path = region_strip(theta_0 = region$base_theta, lower_bnd = region$corner[3], upper_bnd = region$corner[4], eta = eta, type = h_or_v, direction = direction, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func, tau = tau)
+    boundary_path = region_strip(theta_0 = region$base_theta, lower_bnd = region$corner[3], upper_bnd = region$corner[4], eta = eta, type = h_or_v, direction = direction, s = 1, epsilon = mesh_width, delta = cutoff, W_p = W_func, tau = tau, buff_boundary = buff_boundary)
     
  
     
@@ -82,7 +85,8 @@ WCP_2D_Numerical_Density = function(W_func,
   
   mesh = fmesher::fm_mesh_2d(boundary = fmesher::fm_segm( boundary_path, is.bnd = TRUE), max.edge = mesh_width)
   if (visual_mesh){
-    plot(mesh)
+    g <- ggplot2::ggplot() + fmesher::geom_fm(data = mesh)
+    plot(g)
   }
   
   # weights on mesh
@@ -582,7 +586,7 @@ WCP_2D_Numerical_Density = function(W_func,
   approx_WCP_density = eta * approx_detJ_abs * exp(-eta * W_distance)/tarc
   mass_lump_C = fmesher::fm_fem(mesh, order = 1)$c0
   
-  result = list(density_location, approx_WCP_density, mass_lump_C, A_new, W_distance, parc, tarc, approx_detJ_abs)
+  result = list(loc = density_location, val = approx_WCP_density, C = mass_lump_C, basis = A_new, W_distance = W_distance, partial_arclength = parc, total_arclength = tarc, approx_det_jacobian = approx_detJ_abs, mesh = mesh)
   return(result)
   
 }
