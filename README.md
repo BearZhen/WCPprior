@@ -6,9 +6,14 @@
 
 # Installation instructions #
 
-The latest version can be installed by using the command
+The latest development version can be installed by using the command
 ```r
-remotes::install_github("davidbolin/metricgraph", ref = "main")
+remotes::install_github("vpnsctl/WCPprior", ref = "devel")
+```
+
+The latest stable version can be installed by using the command
+```r
+remotes::install_github("vpnsctl/WCPprior", ref = "stable")
 ```
 
 # References #
