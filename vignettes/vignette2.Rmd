@@ -1,0 +1,60 @@
+---
+title: "Bridge to R-INLA and Stan"
+output: html_notebook
+---
+
+## Using WCP prior in R-INLA
+
+Our package allows user to provide WCP prior with a form that R-INLA software can use. Here we give an example with WCP$_2$ prior for $\phi$ of stationary AR(1) processes. The model setup and theoretical details can be found at Section 3.1 from https://arxiv.org/pdf/2312.04481.pdf. We will generate the WCP$_2$ prior by its analytic expression. Functions that encode analytic expression of WCP priors in our package have similar usage. For univariate prior, functions take a sequence of values of parameter of interests and for bivariate priors, functions take one pair of values of the two parameters. If users set the argument 'inla_table' to be TRUE, then the function will output the prior in the format that R-INLA can use.
+
+We first simulate a stationary AR(1) process with length 10, standard deviation 0.1 and $\phi = 0.2$.
+```{r}
+# import INLA
+library(INLA)
+
+# length of the AR1 process
+n = 10
+# standard deviation of the process
+sigma = 0.1
+# value of phi
+phi = 0.2
+# simulate the process
+sim_data = numeric(n)
+sim_data[1] = rnorm(1,mean = 0, sd = sigma)
+for (i in 2:n){
+ sim_data[i] = phi*sim_data[i-1] + rnorm(1, mean = 0, sd = sigma*sqrt(1-phi^2) )
+}
+data = data.frame(y = sim_data, t = 1:n)
+
+
+```
+
+
+The function 'WCP2_1D_AR1_analytic' in our package gives the true WCP$_2$ of $\phi \in [-1,1)$. 
+```{r}
+# create a sequence of values of phi
+seq_phi = seq(from = -1, to = 0.99, by = 0.01)
+# call the function and set inla_table = TRUE so that the function will return a prior that can be used by INLA
+WCP2_prior_table = WCP2_1D_AR1_analytic (seq_phi = seq_phi, 
+                               eta = 7,
+                               n = 13,
+                               sigma = sigma,
+                               inla_table = TRUE)
+# INLA formula
+formula = y~ -1+f(t,model='ar1',hyper = WCP2_prior_table)
+family = "Gaussian"
+# fit the model by INLA
+result = inla(formula=formula, data = data, family=family,
+             control.predictor = list(compute=T))
+summary(result)
+# visualize the result
+plot(data$y, col="blue",
+     ylab="fitting result")
+lines(result$summary.random$t[ ,"mean"])
+```
+
+
+
+Now we show a bivariate example with
+
+
