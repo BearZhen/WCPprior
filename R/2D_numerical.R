@@ -131,7 +131,7 @@ WCP_2D_Numerical_Density = function(W_func,
                           envir = environment())
   parallel::clusterExport(cl, "compute_partial_arc_lengths",
                           envir = environment())
-  
+  on.exit(parallel::stopCluster(cl))
   results <- foreach::foreach (W = seq(from = W_lower_bound, to = W_upper_bound, length = lc_multiplier*ceiling(W_upper_bound/(mesh_width^alpha)))) %dopar% {
     levelcurve = excursions::tricontourmap(mesh_finer, z = weights_fine,
                                levels = W)$contour 

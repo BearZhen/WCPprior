@@ -7,7 +7,7 @@ Authors@R: c(
     person("David", "Bolin", email = "davidbolin@gmail.com", role = "aut"),
     person("Alexandre", "Simas", email = "alexandre.impa@gmail.com", role = c("cre","aut")),
     person("Zhen", "Xiong", email = "zhen.xiong@kaust.edu.sa", role = "aut"))
-Maintainer: Alexandre B. Simas <alexandre.impa@gmail.com>
+Maintainer: Alexandre Simas <alexandre.impa@gmail.com>
 Description: Functions to obtain numerical approximation of Wasserstein complexity penalization (WCP) priors. The package also contains several analytical WCP priors as well as implementations for STAN and INLA.
 License: GPL (>= 2)
 URL: https://vpnsctl.github.io/WCPprior/
@@ -16,7 +16,7 @@ LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 Suggests: 
-    testthat (>= 3.0.0), fmesher, sp, excursions, doParallel, fGarch, knitr, ggplot2
+    testthat (>= 3.0.0), fmesher, sp, excursions, doParallel, fGarch, knitr, ggplot2, INLA, rstan, viridis, rmarkdown, sf
 BugReports: https://github.com/vpnsctl/WCPprior/issues
 VignetteBuilder: knitr
 Config/testthat/edition: 3

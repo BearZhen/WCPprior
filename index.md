@@ -6,8 +6,6 @@
 
 `WCPprior` is an R package used to obtain numerical approximation of Wasserstein complexity penalization (WCP) priors. The package also contains several analytical WCP priors as well as implementations for STAN and INLA.
 
-Please visit the [package homepage][ref2] for detailed tutorials on all different aspects of the package.
-
 # Installation instructions #
 
 The latest development version can be installed by using the command

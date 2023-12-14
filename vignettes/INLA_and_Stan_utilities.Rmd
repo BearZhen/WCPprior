@@ -12,16 +12,21 @@ vignette: >
 
 Our package allows user to provide WCP prior with a form that R-INLA software can use. Here we give an example with WCP$_2$ prior for $\phi$ of stationary AR(1) processes. The model setup and theoretical details can be found at Section 3.1 from https://arxiv.org/pdf/2312.04481.pdf. We will generate the WCP$_2$ prior by its analytic expression. Functions that encode analytic expression of WCP priors in our package have similar usage. For univariate prior, functions take a sequence of values of parameter of interests and for bivariate priors, functions take one pair of values of the two parameters. If users set the argument 'inla_table' to be TRUE, then the function will output the prior in the format that R-INLA can use.
 
+
 We now load the R-INLA and WCPprior library.
 ```{r, message=FALSE}
-library(INLA)
 library(WCPprior)
+library(INLA)
+
+
 ```
 
+
+
 We first simulate a stationary AR(1) process with length 10. We set the standard deviation $\sigma = 0.1$ and $\phi = 0.2$.
-```{r}
 
 
+```{r, message=FALSE}
 # length of the AR1 process
 n = 10
 # standard deviation of the process
