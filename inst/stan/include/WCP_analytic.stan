@@ -52,7 +52,7 @@ real WCP2_2D_Gaussian_analytic_log(vector x, real eta, real base_m){
   // x[1] is mean parameter, x[2] is standard deviation parameter
   real density;
   real ldensity;
-  density = eta/sqrt( (x[1] - base_m )^2 + x[2]^2) * exp(-eta * sqrt( (x[1] - base_m )^2 + x[2]^2))/pi;
+  density = eta/sqrt( (x[1] - base_m )^2 + x[2]^2) * exp(-eta * sqrt( (x[1] - base_m )^2 + x[2]^2))/pi();
   ldensity = log(density);
   return ldensity;
 }
@@ -66,7 +66,6 @@ real WCP1_2D_GP_analytic_log(vector x, real eta){
   density = eta/(1 - x[2]) * exp(-eta * x[1]/(1 - x[2]) );
   ldensity = log(density);
   return ldensity;
-  
 }
 
 // log-likelihood of generalized Pareto
@@ -74,7 +73,7 @@ real generalized_Pareto_log(vector x, real sigma, real xi){
   vector [num_elements(x)] prob;
   real lprob;
   for (i in 1:num_elements(x)){
-    prob[i] = (sigma^(-1)) * (1 + xi*x[i]/sigma)^(-1/xi - 1)
+    prob[i] = (sigma^(-1)) * (1 + xi*x[i]/sigma)^(-1/xi - 1);
   }
   lprob = sum(log(prob));
   return lprob;

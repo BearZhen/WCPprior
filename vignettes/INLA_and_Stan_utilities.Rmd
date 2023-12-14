@@ -47,7 +47,7 @@ data = data.frame(y = sim_data, t = 1:n)
 Now we are ready to setup the WCP$_2$ prior of $\phi$ by using the function 'WCP2_1D_AR1_analytic' from WCPprior package. User should input a sequence of values of  $\phi \in [-1,1]$ with information of $n$, $\sigma$ and $\eta$. 
 ```{r}
 # create a sequence of values of phi
-seq_phi = seq(from = -1, to = 1, by = 0.001)
+seq_phi = seq(from = -1, to = 0.999, by = 0.001)
 # call the function and set inla_table = TRUE so that the function will return a prior that can be used by INLA
 WCP2_prior_table = WCP2_1D_AR1_analytic (seq_phi = seq_phi, 
                                eta = 15,
@@ -95,14 +95,14 @@ WCPprior package also provides format of WCP priors that can be used by stan. Th
 Here we show an example of using 'WCP2_1D_AR1_analytic' function in stan.
 
 The first block in the stan file should be a function block that includes the implemented functions from WCPprior package.
-```{r}
+```{stan,  output.var='model', eval=FALSE}
 functions {
 #include /include/WCP_analytic.stan
 }
 ```
 
 The second block specifies data. That is an AR(1) process, y,  with length $N$.
-```{r}
+```{stan,  output.var='model', eval=FALSE}
 data {
   int<lower=0> N;
   vector[N] y;
@@ -110,14 +110,14 @@ data {
 ```
 
 The third block specifies parameter of interests, which is $\phi$ and its range is $[-1,1]$
-```{r}
+```{stan,  output.var='model', eval=FALSE}
 parameters {
   real<lower = -1, upper = 1> phi;
 }
 ```
 
 The last block specifies model setup including log-likelihood of the process and log-likehood of the WCP prior. Here, the first argument of the function 'WCP2_1D_AR1_analytic' is length of the process, the second one is value of $\eta$ and the last one is value of $\sigma$ (standard deviation of the process).
-```{r}
+```{stan,  output.var='model', eval=FALSE}
 model {
   for (n in 2:N)
     y[n] ~ normal(phi * y[n-1], 0.1);
@@ -125,3 +125,50 @@ model {
 }
 ```
 
+Let us now create the `stan` file and build the model:
+
+```{stan, output.var='model'}
+functions {
+#include ../inst/stan/include/WCP_analytic.stan
+}
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+parameters {
+  real<lower = -1, upper = 1> phi;
+}
+model {
+  for (n in 2:N){
+    y[n] ~ normal(phi * y[n-1], 0.1);
+  }
+  phi ~ WCP2_1D_AR1_analytic(N, 2.172101, 0.1);
+}
+```
+
+Let us sample an AR1 process, where `n` is the length of the process:
+
+```{r}
+n = 100
+sigma = 0.1
+phi = 0.8
+sim_data = numeric(n)
+sim_data[1] = rnorm(1,mean = 0, sd = sigma)
+for (i in 2:n){
+  sim_data[i] = phi*sim_data[i-1] + rnorm(1, mean = 0, sd = sigma*sqrt(1-phi^2) )
+}
+data <- list(N = 100L, 
+             y = sim_data)
+```
+
+We will now fit the model in `stan`. Observe that we are calling the `sampling` function as we have the model as an `R` object.
+
+```{r, warning = FALSE, message=FALSE}
+fit_WCP_AR <- sampling(model, data = data, iter = 1000) 
+```
+
+Let us plot the fitted model:
+
+```{r}
+plot(fit_WCP_AR)
+```
