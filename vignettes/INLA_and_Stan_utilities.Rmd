@@ -164,6 +164,7 @@ data <- list(N = 100L,
 We will now fit the model in `stan`. Observe that we are calling the `sampling` function as we have the model as an `R` object.
 
 ```{r, warning = FALSE, message=FALSE}
+library(rstan)
 fit_WCP_AR <- sampling(model, data = data, iter = 1000) 
 ```
 
