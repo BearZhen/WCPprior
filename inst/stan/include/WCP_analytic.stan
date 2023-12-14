@@ -1,5 +1,5 @@
 // analytic 1D WCP2 prior for phi of AR1 process
-real WCP_1D_AR1_analytic_log(real x, int n, real eta, real sigma){
+real WCP2_1D_AR1_analytic_log(real x, int n, real eta, real sigma){
     real density;
     real ldensity;
     real f;
@@ -15,7 +15,7 @@ real WCP_1D_AR1_analytic_log(real x, int n, real eta, real sigma){
 }
 
 // analytic 1D WCP1 for xi (tail index) of generalized Pareto distribution
-real WCP_1D_GPtail_analytic_log(real x, real eta){
+real WCP1_1D_GPtail_analytic_log(real x, real eta){
     real density;
     real ldensity;
     
@@ -26,7 +26,7 @@ real WCP_1D_GPtail_analytic_log(real x, real eta){
 }
 
 // analytic 1D WCP2 for for precision parameter tau (1/variance) of Gaussian distribution
-real WCP_1D_Gaussian_precision_analytic_log(real x, real eta){
+real WCP2_1D_Gaussian_precision_analytic_log(real x, real eta){
     real density;
     real ldensity;
     
@@ -37,7 +37,7 @@ real WCP_1D_Gaussian_precision_analytic_log(real x, real eta){
 }
 
 // analytic 1D WCP2 for for mean parameter of Gaussian distribution
-real WCP_1D_Gaussian_mean_analytic_log(real x, real eta){
+real WCP2_1D_Gaussian_mean_analytic_log(real x, real eta){
     real density;
     real ldensity;
     
@@ -48,7 +48,7 @@ real WCP_1D_Gaussian_mean_analytic_log(real x, real eta){
 }
 
 //  2d analytic density WCP prior for mean and standard deviation of Gaussian distribution
-real WCP_2D_Gaussian_analytic_log(vector x, real eta, real base_m){
+real WCP2_2D_Gaussian_analytic_log(vector x, real eta, real base_m){
   // x[1] is mean parameter, x[2] is standard deviation parameter
   real density;
   real ldensity;
@@ -59,7 +59,7 @@ real WCP_2D_Gaussian_analytic_log(vector x, real eta, real base_m){
 
 
 //  2d analytic density WCP prior for sigma and xi of generalized Pareto distribution
-real WCP_2D_GP_analytic_log(vector x, real eta){
+real WCP1_2D_GP_analytic_log(vector x, real eta){
   // x[1] is sigma, x[2] is xi
   real density;
   real ldensity;

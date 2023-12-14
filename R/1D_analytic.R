@@ -23,8 +23,8 @@ WCP2_1D_AR1_analytic = function(seq_phi,
   density = numeric()
   for (i in 1:length(seq_phi)){
     phi = seq_phi[i]
-    if (phi < -1 | phi >=1 ) {
-      stop("phi should be in [-1, 1)!")
+    if (phi < -1 | phi > 1 ) {
+      stop("phi should be in [-1, 1]!")
     }
     f = sqrt(n*(1 - phi^2) - 2*phi*(1 - phi^n))
     c = sigma * sqrt( 2*n - sqrt(2)*sqrt(1 - (-1)^n) )

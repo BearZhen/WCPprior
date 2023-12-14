@@ -8,14 +8,19 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Using WCP prior in R-INLA
+## Using univariate WCP prior in R-INLA
 
 Our package allows user to provide WCP prior with a form that R-INLA software can use. Here we give an example with WCP$_2$ prior for $\phi$ of stationary AR(1) processes. The model setup and theoretical details can be found at Section 3.1 from https://arxiv.org/pdf/2312.04481.pdf. We will generate the WCP$_2$ prior by its analytic expression. Functions that encode analytic expression of WCP priors in our package have similar usage. For univariate prior, functions take a sequence of values of parameter of interests and for bivariate priors, functions take one pair of values of the two parameters. If users set the argument 'inla_table' to be TRUE, then the function will output the prior in the format that R-INLA can use.
 
-We first simulate a stationary AR(1) process with length 10, standard deviation 0.1 and $\phi = 0.2$.
-```{r}
-# import INLA
+We now load the R-INLA and WCPprior library.
+```{r, message=FALSE}
 library(INLA)
+library(WCPprior)
+```
+
+We first simulate a stationary AR(1) process with length 10. We set the standard deviation $\sigma = 0.1$ and $\phi = 0.2$.
+```{r}
+
 
 # length of the AR1 process
 n = 10
@@ -31,35 +36,87 @@ for (i in 2:n){
 }
 data = data.frame(y = sim_data, t = 1:n)
 
-
 ```
 
 
-The function 'WCP2_1D_AR1_analytic' in our package gives the true WCP$_2$ of $\phi \in [-1,1)$. 
+Now we are ready to setup the WCP$_2$ prior of $\phi$ by using the function 'WCP2_1D_AR1_analytic' from WCPprior package. User should input a sequence of values of  $\phi \in [-1,1]$ with information of $n$, $\sigma$ and $\eta$. 
 ```{r}
 # create a sequence of values of phi
-seq_phi = seq(from = -1, to = 0.99, by = 0.01)
+seq_phi = seq(from = -1, to = 1, by = 0.001)
 # call the function and set inla_table = TRUE so that the function will return a prior that can be used by INLA
 WCP2_prior_table = WCP2_1D_AR1_analytic (seq_phi = seq_phi, 
-                               eta = 7,
-                               n = 13,
+                               eta = 15,
+                               n = 10,
                                sigma = sigma,
                                inla_table = TRUE)
-# INLA formula
+
+
+
+```
+By setting 'inla_table = TRUE', the output of this function can be directly used by INLA for specifying prior in its formula.
+```{r}
 formula = y~ -1+f(t,model='ar1',hyper = WCP2_prior_table)
-family = "Gaussian"
-# fit the model by INLA
-result = inla(formula=formula, data = data, family=family,
+```
+Then, we are ready to fit the model with the simulated process and WCP prior by INLA.
+```{r}
+
+
+result = inla(formula=formula, data = data, family="Gaussian",
              control.predictor = list(compute=T))
+
 summary(result)
-# visualize the result
+```
+
+Finally, we visualize the result.
+
+```{r}
+
 plot(data$y, col="blue",
      ylab="fitting result")
 lines(result$summary.random$t[ ,"mean"])
 ```
 
 
+## Using univariate WCP prior in stan
 
-Now we show a bivariate example with
+WCPprior package also provides format of WCP priors that can be used by stan. The implemented priors are: 
+(1), WCP$_2$ prior for $\phi$ of stationary AR(1) process. (WCP2_1D_AR1_analytic) \
+(2), WCP$_1$ prior for $\xi$, the tail index, of generalized Pareto distribution. (WCP1_1D_GPtail_analytic) \
+(3), WCP$_2$ prior for precision parameter (reciprocal of variance) of Gaussian distribution. (WCP2_1D_Gaussian_precision_analytic) \
+(4), WCP$_2$ prior for mean parameter of Gaussian distribution. (WCP2_1D_Gaussian_mean_analytic) \
+(5), Bivariate WCP$_2$ prior for mean and standard deviation parameter of Gaussian distribution. (WCP2_2D_Gaussian_analytic) \
+(6), Bivariate WCP$_1$ prior for $\sigma$ and $\xi$ of generalized Pareto distribution. (WCP1_2D_GP_analytic) \
 
+Here we show an example of using 'WCP2_1D_AR1_analytic' function in stan.
+
+The first block in the stan file should be a function block that includes the implemented functions from WCPprior package.
+```{r}
+functions {
+#include /include/WCP_analytic.stan
+}
+```
+
+The second block specifies data. That is an AR(1) process, y,  with length $N$.
+```{r}
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+```
+
+The third block specifies parameter of interests, which is $\phi$ and its range is $[-1,1]$
+```{r}
+parameters {
+  real<lower = -1, upper = 1> phi;
+}
+```
+
+The last block specifies model setup including log-likelihood of the process and log-likehood of the WCP prior. Here, the first argument of the function 'WCP2_1D_AR1_analytic' is length of the process, the second one is value of $\eta$ and the last one is value of $\sigma$ (standard deviation of the process).
+```{r}
+model {
+  for (n in 2:N)
+    y[n] ~ normal(phi * y[n-1], 0.1);
+  phi ~ WCP2_1D_AR1_analytic(N, 2.172101, 0.1);
+}
+```
 

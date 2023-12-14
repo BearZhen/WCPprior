@@ -19,7 +19,7 @@ model {
   for (n in 2:N)
     y[n] ~ normal(phi * y[n-1], 0.1);
   //eta = -3.932725e-11;
-  phi ~ WCP_1D_AR1_analytic(N, 2.172101, 0.1);
+  phi ~ WCP2_1D_AR1_analytic(N, 2.172101, 0.1);
 }
 
 
