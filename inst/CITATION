@@ -1,0 +1,33 @@
+citHeader("To cite WCPprior in publications use the first of the following references to cite the package and the second to cite the paper that introduced the prior:")
+
+bibentry( bibtype = "Manual",
+ title = "WCPprior: Wasserstein Complexity Penalization Priors",
+ author = c(person(given = "David",
+                          family = "Bolin",
+                          email = "davidbolin@gmail.com"),
+                          person(given = "Alexandre B.",
+                          family = "Simas",
+                          email = "alexandre.simas@kaust.edu.sa"),
+                          person(given = "Zhen",
+                          family = "Xiong",
+                          email = "zhen.xiong@kaust.edu.sa")),
+ year = "2023",
+ note = "R package version 1.0",
+ url = "https://vpnsctl.github.io/WCPprior/",
+)
+
+bibentry(bibtype = "Article",
+  title        = "Wasserstein complexity penalization priors: a new class of penalizing complexity priors",
+  author       = c(person(given = "David",
+                          family = "Bolin",
+                          email = "davidbolin@gmail.com"),
+                   person(given = "Alexandre B.",
+                          family = "Simas",
+                          email = "alexandre.simas@kaust.edu.sa"),
+                   person(given = "Zhen",
+                          family = "Xiong",
+                          email = "zhen.xiong@kaust.edu.sa")),
+  year         = "2023",
+ journal = "arXiv preprint arXiv:2312.04481",
+         doi = "10.48550/arXiv.2312.04481"
+)
