@@ -73,7 +73,7 @@
       <img src="" class="logo" alt=""><h1>Bridge to R-INLA and Stan</h1>
             
             <h4 data-toc-skip class="date">Created: 2023-12-13. Last
-modified: 2023-12-13.</h4>
+modified: 2023-12-14.</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/vpnsctl/WCPprior/blob/HEAD/vignettes/INLA_and_Stan_utilities.Rmd" class="external-link"><code>vignettes/INLA_and_Stan_utilities.Rmd</code></a></small>
       <div class="d-none name"><code>INLA_and_Stan_utilities.Rmd</code></div>
@@ -82,7 +82,7 @@ modified: 2023-12-13.</h4>
     
     
 <div class="section level2">
-<h2 id="using-wcp-prior-in-r-inla">Using WCP prior in R-INLA<a class="anchor" aria-label="anchor" href="#using-wcp-prior-in-r-inla"></a>
+<h2 id="using-univariate-wcp-prior-in-r-inla">Using univariate WCP prior in R-INLA<a class="anchor" aria-label="anchor" href="#using-univariate-wcp-prior-in-r-inla"></a>
 </h2>
 <p>Our package allows user to provide WCP prior with a form that R-INLA
 software can use. Here we give an example with WCP<span class="math inline">\(_2\)</span> prior for <span class="math inline">\(\phi\)</span> of stationary AR(1) processes. The
@@ -94,19 +94,14 @@ sequence of values of parameter of interests and for bivariate priors,
 functions take one pair of values of the two parameters. If users set
 the argument ‘inla_table’ to be TRUE, then the function will output the
 prior in the format that R-INLA can use.</p>
-<p>We first simulate a stationary AR(1) process with length 10, standard
-deviation 0.1 and <span class="math inline">\(\phi = 0.2\)</span>.</p>
+<p>We now load the R-INLA and WCPprior library.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># import INLA</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vpnsctl.github.io/WCPprior/">WCPprior</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vpnsctl.github.io/WCPprior/">WCPprior</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">INLA</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Loading required package: Matrix</span></span></code></pre>
-<pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
-<pre><code><span><span class="co">## This is INLA_23.12.06-1 built 2023-12-06 16:40:08 UTC.</span></span>
-<span><span class="co">##  - See www.r-inla.org/contact-us for how to get help.</span></span>
-<span><span class="co">##  - List available models/likelihoods/etc with inla.list.models()</span></span>
-<span><span class="co">##  - Use inla.doc(&lt;NAME&gt;) to access documentation</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>We first simulate a stationary AR(1) process with length 10. We set
+the standard deviation <span class="math inline">\(\sigma = 0.1\)</span>
+and <span class="math inline">\(\phi = 0.2\)</span>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># length of the AR1 process</span></span>
 <span><span class="va">n</span> <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="co"># standard deviation of the process</span></span>
@@ -120,23 +115,29 @@ deviation 0.1 and <span class="math inline">\(\phi = 0.2\)</span>.</p>
 <span> <span class="va">sim_data</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">=</span> <span class="va">phi</span><span class="op">*</span><span class="va">sim_data</span><span class="op">[</span><span class="va">i</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="va">sigma</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">phi</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">sim_data</span>, t <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span></span></code></pre></div>
-<p>The function ‘WCP2_1D_AR1_analytic’ in our package gives the true
-WCP<span class="math inline">\(_2\)</span> of <span class="math inline">\(\phi \in [-1,1)\)</span>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>Now we are ready to setup the WCP<span class="math inline">\(_2\)</span> prior of <span class="math inline">\(\phi\)</span> by using the function
+‘WCP2_1D_AR1_analytic’ from WCPprior package. User should input a
+sequence of values of <span class="math inline">\(\phi \in
+[-1,1]\)</span> with information of <span class="math inline">\(n\)</span>, <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\eta\)</span>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create a sequence of values of phi</span></span>
-<span><span class="va">seq_phi</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, to <span class="op">=</span> <span class="fl">0.99</span>, by <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
+<span><span class="va">seq_phi</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, to <span class="op">=</span> <span class="fl">0.999</span>, by <span class="op">=</span> <span class="fl">0.001</span><span class="op">)</span></span>
 <span><span class="co"># call the function and set inla_table = TRUE so that the function will return a prior that can be used by INLA</span></span>
 <span><span class="va">WCP2_prior_table</span> <span class="op">=</span> <span class="fu"><a href="../reference/WCP2_1D_AR1_analytic.html">WCP2_1D_AR1_analytic</a></span> <span class="op">(</span>seq_phi <span class="op">=</span> <span class="va">seq_phi</span>, </span>
-<span>                               eta <span class="op">=</span> <span class="fl">7</span>,</span>
-<span>                               n <span class="op">=</span> <span class="fl">13</span>,</span>
+<span>                               eta <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>                               n <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>                               sigma <span class="op">=</span> <span class="va">sigma</span>,</span>
-<span>                               inla_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co"># INLA formula</span></span>
-<span><span class="va">formula</span> <span class="op">=</span> <span class="va">y</span><span class="op">~</span> <span class="op">-</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">t</span>,model<span class="op">=</span><span class="st">'ar1'</span>,hyper <span class="op">=</span> <span class="va">WCP2_prior_table</span><span class="op">)</span></span>
-<span><span class="va">family</span> <span class="op">=</span> <span class="st">"Gaussian"</span></span>
-<span><span class="co"># fit the model by INLA</span></span>
-<span><span class="va">result</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">data</span>, family<span class="op">=</span><span class="va">family</span>,</span>
+<span>                               inla_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>By setting ‘inla_table = TRUE’, the output of this function can be
+directly used by INLA for specifying prior in its formula.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">formula</span> <span class="op">=</span> <span class="va">y</span><span class="op">~</span> <span class="op">-</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/pkg/INLA/man/f.html" class="external-link">f</a></span><span class="op">(</span><span class="va">t</span>,model<span class="op">=</span><span class="st">'ar1'</span>,hyper <span class="op">=</span> <span class="va">WCP2_prior_table</span><span class="op">)</span></span></code></pre></div>
+<p>Then, we are ready to fit the model with the simulated process and
+WCP prior by INLA.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/INLA/man/inla.html" class="external-link">inla</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">data</span>, family<span class="op">=</span><span class="st">"Gaussian"</span>,</span>
 <span>             control.predictor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>compute<span class="op">=</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
@@ -157,32 +158,221 @@ WCP<span class="math inline">\(_2\)</span> of <span class="math inline">\(\phi \
 <span><span class="co">##    silent = silent, ", " inla.mode = inla.mode, safe = FALSE, debug = </span></span>
 <span><span class="co">##    debug, .parent.frame = .parent.frame)" ) </span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.252, Running = 0.277, Post = 0.0198, Total = 0.548 </span></span>
+<span><span class="co">##     Pre = 0.261, Running = 0.298, Post = 0.0208, Total = 0.58 </span></span>
 <span><span class="co">## Random effects:</span></span>
 <span><span class="co">##   Name     Model</span></span>
 <span><span class="co">##     t AR1 model</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Model hyperparameters:</span></span>
 <span><span class="co">##                                             mean       sd 0.025quant 0.5quant</span></span>
-<span><span class="co">## Precision for the Gaussian observations 2.16e+02    90.94     85.122 2.01e+02</span></span>
-<span><span class="co">## Precision for t                         2.16e+04 24015.58   1373.013 1.41e+04</span></span>
-<span><span class="co">## Rho for t                               1.00e-03     0.71     -0.991 4.00e-03</span></span>
+<span><span class="co">## Precision for the Gaussian observations 2.17e+04 2.40e+04   1385.454 1.41e+04</span></span>
+<span><span class="co">## Precision for t                         1.71e+02 7.89e+01     58.589 1.57e+02</span></span>
+<span><span class="co">## Rho for t                               5.21e-01 1.96e-01      0.089 5.42e-01</span></span>
 <span><span class="co">##                                         0.975quant     mode</span></span>
-<span><span class="co">## Precision for the Gaussian observations     436.34  172.175</span></span>
-<span><span class="co">## Precision for t                           85392.65 3708.260</span></span>
-<span><span class="co">## Rho for t                                     0.99   -0.999</span></span>
+<span><span class="co">## Precision for the Gaussian observations   8.54e+04 3747.479</span></span>
+<span><span class="co">## Precision for t                           3.62e+02  130.538</span></span>
+<span><span class="co">## Rho for t                                 8.42e-01    0.589</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  6.97 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  5.41 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># visualize the result</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, col<span class="op">=</span><span class="st">"blue"</span>,</span>
+<p>Finally, we visualize the result.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span>, col<span class="op">=</span><span class="st">"blue"</span>,</span>
 <span>     ylab<span class="op">=</span><span class="st">"fitting result"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary.random</span><span class="op">$</span><span class="va">t</span><span class="op">[</span> ,<span class="st">"mean"</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="INLA_and_Stan_utilities_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>Now we show a bivariate example with</p>
+<p><img src="INLA_and_Stan_utilities_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="using-univariate-wcp-prior-in-stan">Using univariate WCP prior in stan<a class="anchor" aria-label="anchor" href="#using-univariate-wcp-prior-in-stan"></a>
+</h2>
+<p>WCPprior package also provides format of WCP priors that can be used
+by stan. The implemented priors are: (1), WCP<span class="math inline">\(_2\)</span> prior for <span class="math inline">\(\phi\)</span> of stationary AR(1) process.
+(WCP2_1D_AR1_analytic)<br>
+(2), WCP<span class="math inline">\(_1\)</span> prior for <span class="math inline">\(\xi\)</span>, the tail index, of generalized
+Pareto distribution. (WCP1_1D_GPtail_analytic)<br>
+(3), WCP<span class="math inline">\(_2\)</span> prior for precision
+parameter (reciprocal of variance) of Gaussian distribution.
+(WCP2_1D_Gaussian_precision_analytic)<br>
+(4), WCP<span class="math inline">\(_2\)</span> prior for mean parameter
+of Gaussian distribution. (WCP2_1D_Gaussian_mean_analytic)<br>
+(5), Bivariate WCP<span class="math inline">\(_2\)</span> prior for mean
+and standard deviation parameter of Gaussian distribution.
+(WCP2_2D_Gaussian_analytic)<br>
+(6), Bivariate WCP<span class="math inline">\(_1\)</span> prior for
+<span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\xi\)</span> of generalized Pareto distribution.
+(WCP1_2D_GP_analytic)<br></p>
+<p>Here we show an example of using ‘WCP2_1D_AR1_analytic’ function in
+stan.</p>
+<p>The first block in the stan file should be a function block that
+includes the implemented functions from WCPprior package.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">functions</span> {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#include /include/WCP_analytic.stan</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The second block specifies data. That is an AR(1) process, y, with
+length <span class="math inline">\(N\)</span>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N;</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[N] y;</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The third block specifies parameter of interests, which is <span class="math inline">\(\phi\)</span> and its range is <span class="math inline">\([-1,1]\)</span></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span> = -<span class="dv">1</span>, <span class="kw">upper</span> = <span class="dv">1</span>&gt; phi;</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The last block specifies model setup including log-likelihood of the
+process and log-likehood of the WCP prior. Here, the first argument of
+the function ‘WCP2_1D_AR1_analytic’ is length of the process, the second
+one is value of <span class="math inline">\(\eta\)</span> and the last
+one is value of <span class="math inline">\(\sigma\)</span> (standard
+deviation of the process).</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">2</span>:N)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    y[n] ~ normal(phi * y[n<span class="dv">-1</span>], <span class="fl">0.1</span>);</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  phi ~ WCP2_1D_AR1_analytic(N, <span class="fl">2.172101</span>, <span class="fl">0.1</span>);</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Let us now create the <code>stan</code> file and build the model:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">functions</span> {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#include ../inst/stan/include/WCP_analytic.stan</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N;</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[N] y;</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span> = -<span class="dv">1</span>, <span class="kw">upper</span> = <span class="dv">1</span>&gt; phi;</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">2</span>:N){</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    y[n] ~ normal(phi * y[n<span class="dv">-1</span>], <span class="fl">0.1</span>);</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  phi ~ WCP2_1D_AR1_analytic(N, <span class="fl">2.172101</span>, <span class="fl">0.1</span>);</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Let us sample an AR1 process, where <code>n</code> is the length of
+the process:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">n</span> <span class="op">=</span> <span class="fl">100</span></span>
+<span><span class="va">sigma</span> <span class="op">=</span> <span class="fl">0.1</span></span>
+<span><span class="va">phi</span> <span class="op">=</span> <span class="fl">0.8</span></span>
+<span><span class="va">sim_data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span><span class="va">sim_data</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>,mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="va">sigma</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">2</span><span class="op">:</span><span class="va">n</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">sim_data</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">=</span> <span class="va">phi</span><span class="op">*</span><span class="va">sim_data</span><span class="op">[</span><span class="va">i</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="va">sigma</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">phi</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">100L</span>, </span>
+<span>             y <span class="op">=</span> <span class="va">sim_data</span><span class="op">)</span></span></code></pre></div>
+<p>We will now fit the model in <code>stan</code>. Observe that we are
+calling the <code>sampling</code> function as we have the model as an
+<code>R</code> object.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstan/" class="external-link">rstan</a></span><span class="op">)</span></span>
+<span><span class="va">fit_WCP_AR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">data</span>, iter <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> </span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1: Gradient evaluation took 2.1e-05 seconds</span></span>
+<span><span class="co">## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.21 seconds.</span></span>
+<span><span class="co">## Chain 1: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1:  Elapsed Time: 0.022 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 1:                0.021 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 1:                0.043 seconds (Total)</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2: Gradient evaluation took 1e-05 seconds</span></span>
+<span><span class="co">## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.</span></span>
+<span><span class="co">## Chain 2: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2:  Elapsed Time: 0.022 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 2:                0.016 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 2:                0.038 seconds (Total)</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3: Gradient evaluation took 1.2e-05 seconds</span></span>
+<span><span class="co">## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.</span></span>
+<span><span class="co">## Chain 3: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3:  Elapsed Time: 0.022 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 3:                0.02 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 3:                0.042 seconds (Total)</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).</span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4: Gradient evaluation took 1.3e-05 seconds</span></span>
+<span><span class="co">## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.</span></span>
+<span><span class="co">## Chain 4: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4:  Elapsed Time: 0.021 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 4:                0.024 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 4:                0.045 seconds (Total)</span></span>
+<span><span class="co">## Chain 4:</span></span></code></pre>
+<p>Let us plot the fitted model:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_WCP_AR</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## ci_level: 0.8 (80% intervals)</span></span></code></pre>
+<pre><code><span><span class="co">## outer_level: 0.95 (95% intervals)</span></span></code></pre>
+<p><img src="INLA_and_Stan_utilities_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
