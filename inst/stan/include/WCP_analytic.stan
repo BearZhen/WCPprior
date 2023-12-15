@@ -59,11 +59,11 @@ real WCP2_2D_Gaussian_analytic_log(vector x, real eta, real base_m){
 
 
 //  2d analytic density WCP prior for sigma and xi of generalized Pareto distribution
-real WCP1_2D_GP_analytic_log(vector x, real eta){
+real WCP1_2D_GP_analytic_log(real sigma, real xi, real eta){
   // x[1] is sigma, x[2] is xi
   real density;
   real ldensity;
-  density = eta/(1 - x[2]) * exp(-eta * x[1]/(1 - x[2]) );
+  density = eta/(1 - xi) * exp(-eta * sigma/(1 - xi) );
   ldensity = log(density);
   return ldensity;
 }

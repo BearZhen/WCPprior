@@ -84,13 +84,12 @@ lines(result$summary.random$t[ ,"mean"])
 
 ## Using univariate WCP prior in stan
 
-WCPprior package also provides format of WCP priors that can be used by stan. The implemented priors are: 
+WCPprior package also provides format of univariate WCP priors that can be used by stan. The implemented priors are: 
 (1), WCP$_2$ prior for $\phi$ of stationary AR(1) process. (WCP2_1D_AR1_analytic) \
 (2), WCP$_1$ prior for $\xi$, the tail index, of generalized Pareto distribution. (WCP1_1D_GPtail_analytic) \
 (3), WCP$_2$ prior for precision parameter (reciprocal of variance) of Gaussian distribution. (WCP2_1D_Gaussian_precision_analytic) \
 (4), WCP$_2$ prior for mean parameter of Gaussian distribution. (WCP2_1D_Gaussian_mean_analytic) \
-(5), Bivariate WCP$_2$ prior for mean and standard deviation parameter of Gaussian distribution. (WCP2_2D_Gaussian_analytic) \
-(6), Bivariate WCP$_1$ prior for $\sigma$ and $\xi$ of generalized Pareto distribution. (WCP1_2D_GP_analytic) \
+
 
 Here we show an example of using 'WCP2_1D_AR1_analytic' function in stan.
 
@@ -172,4 +171,96 @@ Let us plot the fitted model:
 
 ```{r}
 plot(fit_WCP_AR)
+```
+
+
+
+
+
+## Using bivariate WCP prior in stan
+
+The following two bivariate WCP priors that are also implemented in stan functions in WCPprior package:
+(1), Bivariate WCP$_2$ prior for mean and standard deviation parameter of Gaussian distribution. (WCP2_2D_Gaussian_analytic) \
+(2), Bivariate WCP$_1$ prior for $\sigma$ and $\xi$ of generalized Pareto distribution. (WCP1_2D_GP_analytic) \
+
+Here we show an example of using 'WCP1_2D_GP_analytic' function in stan.
+
+The first block in the stan file should be a function block that includes the implemented functions from WCPprior package.
+```{stan,  output.var='model', eval=FALSE}
+functions {
+#include /include/WCP_analytic.stan
+}
+```
+
+The data block specifies $N$ numbers of independent and identically distributed data with generalized Pareto distribution.
+```{stan,  output.var='model', eval=FALSE}
+data {
+  int<lower=0> N; //number of data
+  real y[N]; //iid data
+}
+
+```
+
+The parameter block specifies the two parameters as a two dimensional vector.
+```{stan,  output.var='model', eval=FALSE}
+parameters {
+  real<lower = 0> sigma;
+  real<lower = 0, upper = 1> xi;
+}
+
+```
+
+The model block can be created by calling stan functions 'WCP1_2D_GP_analytic' and 'generalized_Pareto' from WCPprior package.
+```{stan,  output.var='model', eval=FALSE}
+model {
+  target += WCP1_2D_GP_analytic(sigma, xi, 10);
+  target += generalized_Pareto(y, sigma, xi);
+}
+```
+
+Then the complete `stan` file is the following:
+
+```{stan, output.var='model'}
+functions {
+#include ../inst/stan/include/WCP_analytic.stan
+}
+data {
+  int<lower=0> N; //number of data
+  real y[N]; //iid data
+}
+
+parameters {
+  real<lower = 0> sigma;
+  real<lower = 0, upper = 1> xi;
+}
+model {
+  target += WCP1_2D_GP_analytic(sigma, xi, 10);
+  target += generalized_Pareto(y, sigma, xi);
+}
+```
+
+Now we generate simulated generalized Pareto data. First we import a necessary library.
+```{r,warning = FALSE, message=FALSE}
+library("evmix")
+```
+
+We set $\sigma = 0.1, \xi = 2/3$ for the simulated data and call the function 'rgpd' to generate data.
+```{r}
+true_sigma = 0.1
+true_xi = 2/3
+sim_data = rgpd(n = 100, u = 0, sigmau = true_sigma, xi = true_xi, phiu = 1)
+```
+
+
+We will now fit the model in `stan`.
+```{r, warning = FALSE, message=FALSE}
+library(rstan)
+fit_WCP_2D_GP <- sampling(model, data = sim_data, iter = 1000) 
+```
+
+
+Let us plot the fitted model:
+
+```{r}
+plot(fit_WCP_2D_GP)
 ```
