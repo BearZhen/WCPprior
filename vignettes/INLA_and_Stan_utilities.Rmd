@@ -124,7 +124,7 @@ model {
 }
 ```
 
-Let us now create the `stan` file and build the model:
+Let us now create the `stan` file and build the model. It will be stored in the `model` object.
 
 ```{stan, output.var='model'}
 functions {
@@ -196,7 +196,7 @@ The data block specifies $N$ numbers of independent and identically distributed 
 ```{stan,  output.var='model', eval=FALSE}
 data {
   int<lower=0> N; //number of data
-  real y[N]; //iid data
+  vector[N] y; //iid data
 }
 
 ```
@@ -213,12 +213,12 @@ parameters {
 The model block can be created by calling stan functions 'WCP1_2D_GP_analytic' and 'generalized_Pareto' from WCPprior package.
 ```{stan,  output.var='model', eval=FALSE}
 model {
-  target += WCP1_2D_GP_analytic(sigma, xi, 10);
-  target += generalized_Pareto(y, sigma, xi);
+  target += WCP1_2D_GP_analytic_log(sigma, xi, 10);
+  y ~ generalized_Pareto(sigma, xi);
 }
 ```
 
-Then the complete `stan` file is the following:
+Then the complete `stan` file is the following. It will be built and stored in the `model` object.
 
 ```{stan, output.var='model'}
 functions {
@@ -226,7 +226,7 @@ functions {
 }
 data {
   int<lower=0> N; //number of data
-  real y[N]; //iid data
+  vector[N] y; //iid data
 }
 
 parameters {
@@ -234,8 +234,8 @@ parameters {
   real<lower = 0, upper = 1> xi;
 }
 model {
-  target += WCP1_2D_GP_analytic(sigma, xi, 10);
-  target += generalized_Pareto(y, sigma, xi);
+  target += WCP1_2D_GP_analytic_log(sigma, xi, 10);
+  y ~ generalized_Pareto(sigma, xi);
 }
 ```
 
@@ -255,7 +255,7 @@ sim_data = rgpd(n = 100, u = 0, sigmau = true_sigma, xi = true_xi, phiu = 1)
 We will now fit the model in `stan`.
 ```{r, warning = FALSE, message=FALSE}
 library(rstan)
-fit_WCP_2D_GP <- sampling(model, data = sim_data, iter = 1000) 
+fit_WCP_2D_GP <- sampling(model, data = list(N = 100, y = sim_data), iter = 1000) 
 ```
 
 
