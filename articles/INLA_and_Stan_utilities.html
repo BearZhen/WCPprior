@@ -73,7 +73,7 @@
       <img src="" class="logo" alt=""><h1>Bridge to R-INLA and Stan</h1>
             
             <h4 data-toc-skip class="date">Created: 2023-12-13. Last
-modified: 2023-12-14.</h4>
+modified: 2023-12-16.</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/vpnsctl/WCPprior/blob/HEAD/vignettes/INLA_and_Stan_utilities.Rmd" class="external-link"><code>vignettes/INLA_and_Stan_utilities.Rmd</code></a></small>
       <div class="d-none name"><code>INLA_and_Stan_utilities.Rmd</code></div>
@@ -158,22 +158,22 @@ WCP prior by INLA.</p>
 <span><span class="co">##    silent = silent, ", " inla.mode = inla.mode, safe = FALSE, debug = </span></span>
 <span><span class="co">##    debug, .parent.frame = .parent.frame)" ) </span></span>
 <span><span class="co">## Time used:</span></span>
-<span><span class="co">##     Pre = 0.247, Running = 0.282, Post = 0.0201, Total = 0.549 </span></span>
+<span><span class="co">##     Pre = 0.246, Running = 0.276, Post = 0.0194, Total = 0.541 </span></span>
 <span><span class="co">## Random effects:</span></span>
 <span><span class="co">##   Name     Model</span></span>
 <span><span class="co">##     t AR1 model</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Model hyperparameters:</span></span>
 <span><span class="co">##                                             mean       sd 0.025quant 0.5quant</span></span>
-<span><span class="co">## Precision for the Gaussian observations 2.19e+04 2.41e+04   1445.768 1.44e+04</span></span>
-<span><span class="co">## Precision for t                         1.15e+02 4.94e+01     43.274 1.07e+02</span></span>
-<span><span class="co">## Rho for t                               3.15e-01 2.34e-01     -0.166 3.28e-01</span></span>
+<span><span class="co">## Precision for the Gaussian observations 2.13e+04 2.37e+04   1319.707 1.39e+04</span></span>
+<span><span class="co">## Precision for t                         3.38e+02 1.47e+02    128.284 3.13e+02</span></span>
+<span><span class="co">## Rho for t                               2.69e-01 2.53e-01     -0.247 2.81e-01</span></span>
 <span><span class="co">##                                         0.975quant     mode</span></span>
-<span><span class="co">## Precision for the Gaussian observations   86048.83 3932.948</span></span>
-<span><span class="co">## Precision for t                             233.78   90.864</span></span>
-<span><span class="co">## Rho for t                                     0.73    0.341</span></span>
+<span><span class="co">## Precision for the Gaussian observations   84154.79 3546.987</span></span>
+<span><span class="co">## Precision for t                             694.22  265.633</span></span>
+<span><span class="co">## Rho for t                                     0.72    0.295</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Marginal log-Likelihood:  2.06 </span></span>
+<span><span class="co">## Marginal log-Likelihood:  8.37 </span></span>
 <span><span class="co">##  is computed </span></span>
 <span><span class="co">## Posterior summaries for the linear predictor and the fitted values are computed</span></span>
 <span><span class="co">## (Posterior marginals needs also 'control.compute=list(return.marginals.predictor=TRUE)')</span></span></code></pre>
@@ -187,8 +187,8 @@ WCP prior by INLA.</p>
 <div class="section level2">
 <h2 id="using-univariate-wcp-prior-in-stan">Using univariate WCP prior in stan<a class="anchor" aria-label="anchor" href="#using-univariate-wcp-prior-in-stan"></a>
 </h2>
-<p>WCPprior package also provides format of WCP priors that can be used
-by stan. The implemented priors are: (1), WCP<span class="math inline">\(_2\)</span> prior for <span class="math inline">\(\phi\)</span> of stationary AR(1) process.
+<p>WCPprior package also provides format of univariate WCP priors that
+can be used by stan. The implemented priors are: (1), WCP<span class="math inline">\(_2\)</span> prior for <span class="math inline">\(\phi\)</span> of stationary AR(1) process.
 (WCP2_1D_AR1_analytic)<br>
 (2), WCP<span class="math inline">\(_1\)</span> prior for <span class="math inline">\(\xi\)</span>, the tail index, of generalized
 Pareto distribution. (WCP1_1D_GPtail_analytic)<br>
@@ -196,13 +196,7 @@ Pareto distribution. (WCP1_1D_GPtail_analytic)<br>
 parameter (reciprocal of variance) of Gaussian distribution.
 (WCP2_1D_Gaussian_precision_analytic)<br>
 (4), WCP<span class="math inline">\(_2\)</span> prior for mean parameter
-of Gaussian distribution. (WCP2_1D_Gaussian_mean_analytic)<br>
-(5), Bivariate WCP<span class="math inline">\(_2\)</span> prior for mean
-and standard deviation parameter of Gaussian distribution.
-(WCP2_2D_Gaussian_analytic)<br>
-(6), Bivariate WCP<span class="math inline">\(_1\)</span> prior for
-<span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\xi\)</span> of generalized Pareto distribution.
-(WCP1_2D_GP_analytic)<br></p>
+of Gaussian distribution. (WCP2_1D_Gaussian_mean_analytic)<br></p>
 <p>Here we show an example of using ‘WCP2_1D_AR1_analytic’ function in
 stan.</p>
 <p>The first block in the stan file should be a function block that
@@ -231,7 +225,8 @@ deviation of the process).</p>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    y[n] ~ normal(phi * y[n<span class="dv">-1</span>], <span class="fl">0.1</span>);</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  phi ~ WCP2_1D_AR1_analytic(N, <span class="fl">2.172101</span>, <span class="fl">0.1</span>);</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>Let us now create the <code>stan</code> file and build the model:</p>
+<p>Let us now create the <code>stan</code> file and build the model. It
+will be stored in the <code>model</code> object.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">functions</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#include ../inst/stan/include/WCP_analytic.stan</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>}</span>
@@ -288,9 +283,9 @@ calling the <code>sampling</code> function as we have the model as an
 <span><span class="co">## Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">## Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
 <span><span class="co">## Chain 1: </span></span>
-<span><span class="co">## Chain 1:  Elapsed Time: 0.025 seconds (Warm-up)</span></span>
-<span><span class="co">## Chain 1:                0.016 seconds (Sampling)</span></span>
-<span><span class="co">## Chain 1:                0.041 seconds (Total)</span></span>
+<span><span class="co">## Chain 1:  Elapsed Time: 0.363 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 1:                0.599 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 1:                0.962 seconds (Total)</span></span>
 <span><span class="co">## Chain 1: </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).</span></span>
@@ -313,15 +308,15 @@ calling the <code>sampling</code> function as we have the model as an
 <span><span class="co">## Chain 2: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">## Chain 2: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
 <span><span class="co">## Chain 2: </span></span>
-<span><span class="co">## Chain 2:  Elapsed Time: 0.027 seconds (Warm-up)</span></span>
-<span><span class="co">## Chain 2:                0.025 seconds (Sampling)</span></span>
-<span><span class="co">## Chain 2:                0.052 seconds (Total)</span></span>
+<span><span class="co">## Chain 2:  Elapsed Time: 0.022 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 2:                0.02 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 2:                0.042 seconds (Total)</span></span>
 <span><span class="co">## Chain 2: </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).</span></span>
 <span><span class="co">## Chain 3: </span></span>
-<span><span class="co">## Chain 3: Gradient evaluation took 1.1e-05 seconds</span></span>
-<span><span class="co">## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.</span></span>
+<span><span class="co">## Chain 3: Gradient evaluation took 1e-05 seconds</span></span>
+<span><span class="co">## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.</span></span>
 <span><span class="co">## Chain 3: Adjust your expectations accordingly!</span></span>
 <span><span class="co">## Chain 3: </span></span>
 <span><span class="co">## Chain 3: </span></span>
@@ -338,15 +333,15 @@ calling the <code>sampling</code> function as we have the model as an
 <span><span class="co">## Chain 3: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">## Chain 3: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
 <span><span class="co">## Chain 3: </span></span>
-<span><span class="co">## Chain 3:  Elapsed Time: 0.026 seconds (Warm-up)</span></span>
-<span><span class="co">## Chain 3:                0.011 seconds (Sampling)</span></span>
-<span><span class="co">## Chain 3:                0.037 seconds (Total)</span></span>
+<span><span class="co">## Chain 3:  Elapsed Time: 0.019 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 3:                0.012 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 3:                0.031 seconds (Total)</span></span>
 <span><span class="co">## Chain 3: </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).</span></span>
 <span><span class="co">## Chain 4: </span></span>
-<span><span class="co">## Chain 4: Gradient evaluation took 1.1e-05 seconds</span></span>
-<span><span class="co">## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.</span></span>
+<span><span class="co">## Chain 4: Gradient evaluation took 9e-06 seconds</span></span>
+<span><span class="co">## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.09 seconds.</span></span>
 <span><span class="co">## Chain 4: Adjust your expectations accordingly!</span></span>
 <span><span class="co">## Chain 4: </span></span>
 <span><span class="co">## Chain 4: </span></span>
@@ -363,9 +358,9 @@ calling the <code>sampling</code> function as we have the model as an
 <span><span class="co">## Chain 4: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
 <span><span class="co">## Chain 4: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
 <span><span class="co">## Chain 4: </span></span>
-<span><span class="co">## Chain 4:  Elapsed Time: 0.025 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 4:  Elapsed Time: 0.021 seconds (Warm-up)</span></span>
 <span><span class="co">## Chain 4:                0.015 seconds (Sampling)</span></span>
-<span><span class="co">## Chain 4:                0.04 seconds (Total)</span></span>
+<span><span class="co">## Chain 4:                0.036 seconds (Total)</span></span>
 <span><span class="co">## Chain 4:</span></span></code></pre>
 <p>Let us plot the fitted model:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
@@ -373,6 +368,182 @@ calling the <code>sampling</code> function as we have the model as an
 <pre><code><span><span class="co">## ci_level: 0.8 (80% intervals)</span></span></code></pre>
 <pre><code><span><span class="co">## outer_level: 0.95 (95% intervals)</span></span></code></pre>
 <p><img src="INLA_and_Stan_utilities_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="using-bivariate-wcp-prior-in-stan">Using bivariate WCP prior in stan<a class="anchor" aria-label="anchor" href="#using-bivariate-wcp-prior-in-stan"></a>
+</h2>
+<p>The following two bivariate WCP priors that are also implemented in
+stan functions in WCPprior package: (1), Bivariate WCP<span class="math inline">\(_2\)</span> prior for mean and standard deviation
+parameter of Gaussian distribution. (WCP2_2D_Gaussian_analytic)<br>
+(2), Bivariate WCP<span class="math inline">\(_1\)</span> prior for
+<span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\xi\)</span> of generalized Pareto distribution.
+(WCP1_2D_GP_analytic)<br></p>
+<p>Here we show an example of using ‘WCP1_2D_GP_analytic’ function in
+stan.</p>
+<p>The first block in the stan file should be a function block that
+includes the implemented functions from WCPprior package.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">functions</span> {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#include /include/WCP_analytic.stan</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The data block specifies <span class="math inline">\(N\)</span>
+numbers of independent and identically distributed data with generalized
+Pareto distribution.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N; <span class="co">//number of data</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[N] y; <span class="co">//iid data</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The parameter block specifies the two parameters as a two dimensional
+vector.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span> = <span class="dv">0</span>&gt; sigma;</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span> = <span class="dv">0</span>, <span class="kw">upper</span> = <span class="dv">1</span>&gt; xi;</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The model block can be created by calling stan functions
+‘WCP1_2D_GP_analytic’ and ‘generalized_Pareto’ from WCPprior
+package.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">target +=</span> WCP1_2D_GP_analytic_log(sigma, xi, <span class="dv">10</span>);</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  y ~ generalized_Pareto(sigma, xi);</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Then the complete <code>stan</code> file is the following. It will be
+built and stored in the <code>model</code> object.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode stan"><code class="sourceCode stan"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">functions</span> {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">#include ../inst/stan/include/WCP_analytic.stan</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="kw">data</span> {</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span>&lt;<span class="kw">lower</span>=<span class="dv">0</span>&gt; N; <span class="co">//number of data</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">vector</span>[N] y; <span class="co">//iid data</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="kw">parameters</span> {</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span> = <span class="dv">0</span>&gt; sigma;</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">real</span>&lt;<span class="kw">lower</span> = <span class="dv">0</span>, <span class="kw">upper</span> = <span class="dv">1</span>&gt; xi;</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="kw">model</span> {</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">target +=</span> WCP1_2D_GP_analytic_log(sigma, xi, <span class="dv">10</span>);</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  y ~ generalized_Pareto(sigma, xi);</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Now we generate simulated generalized Pareto data. First we import a
+necessary library.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.math.canterbury.ac.nz/~c.scarrott/evmix" class="external-link">"evmix"</a></span><span class="op">)</span></span></code></pre></div>
+<p>We set <span class="math inline">\(\sigma = 0.1, \xi = 2/3\)</span>
+for the simulated data and call the function ‘rgpd’ to generate
+data.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">true_sigma</span> <span class="op">=</span> <span class="fl">0.1</span></span>
+<span><span class="va">true_xi</span> <span class="op">=</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span></span>
+<span><span class="va">sim_data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/evmix/man/gpd.html" class="external-link">rgpd</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">100</span>, u <span class="op">=</span> <span class="fl">0</span>, sigmau <span class="op">=</span> <span class="va">true_sigma</span>, xi <span class="op">=</span> <span class="va">true_xi</span>, phiu <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>We will now fit the model in <code>stan</code>.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mc-stan.org/rstan/" class="external-link">rstan</a></span><span class="op">)</span></span>
+<span><span class="va">fit_WCP_2D_GP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mc-stan.org/rstan/reference/stanmodel-method-sampling.html" class="external-link">sampling</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">100</span>, y <span class="op">=</span> <span class="va">sim_data</span><span class="op">)</span>, iter <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> </span></code></pre></div>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 1).</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1: Gradient evaluation took 4e-05 seconds</span></span>
+<span><span class="co">## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.4 seconds.</span></span>
+<span><span class="co">## Chain 1: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 1: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## Chain 1:  Elapsed Time: 0.075 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 1:                0.06 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 1:                0.135 seconds (Total)</span></span>
+<span><span class="co">## Chain 1: </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 2).</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2: Gradient evaluation took 2.5e-05 seconds</span></span>
+<span><span class="co">## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.25 seconds.</span></span>
+<span><span class="co">## Chain 2: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 2: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## Chain 2:  Elapsed Time: 0.078 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 2:                0.06 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 2:                0.138 seconds (Total)</span></span>
+<span><span class="co">## Chain 2: </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 3).</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3: Gradient evaluation took 2.7e-05 seconds</span></span>
+<span><span class="co">## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.27 seconds.</span></span>
+<span><span class="co">## Chain 3: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 3: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## Chain 3:  Elapsed Time: 0.08 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 3:                0.08 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 3:                0.16 seconds (Total)</span></span>
+<span><span class="co">## Chain 3: </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## SAMPLING FOR MODEL 'anon_model' NOW (CHAIN 4).</span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4: Gradient evaluation took 2.6e-05 seconds</span></span>
+<span><span class="co">## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.26 seconds.</span></span>
+<span><span class="co">## Chain 4: Adjust your expectations accordingly!</span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4: Iteration:   1 / 1000 [  0%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 100 / 1000 [ 10%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 200 / 1000 [ 20%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 300 / 1000 [ 30%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 400 / 1000 [ 40%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 500 / 1000 [ 50%]  (Warmup)</span></span>
+<span><span class="co">## Chain 4: Iteration: 501 / 1000 [ 50%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 600 / 1000 [ 60%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 700 / 1000 [ 70%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 800 / 1000 [ 80%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 900 / 1000 [ 90%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: Iteration: 1000 / 1000 [100%]  (Sampling)</span></span>
+<span><span class="co">## Chain 4: </span></span>
+<span><span class="co">## Chain 4:  Elapsed Time: 0.073 seconds (Warm-up)</span></span>
+<span><span class="co">## Chain 4:                0.071 seconds (Sampling)</span></span>
+<span><span class="co">## Chain 4:                0.144 seconds (Total)</span></span>
+<span><span class="co">## Chain 4:</span></span></code></pre>
+<p>Let us plot the fitted model:</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_WCP_2D_GP</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## ci_level: 0.8 (80% intervals)</span></span></code></pre>
+<pre><code><span><span class="co">## outer_level: 0.95 (95% intervals)</span></span></code></pre>
+<p><img src="INLA_and_Stan_utilities_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
