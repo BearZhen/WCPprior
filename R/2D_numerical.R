@@ -559,8 +559,12 @@ WCP_2D_Numerical_Density = function(W_func,
   
   ########################### compute partial derivatives of partial arc length and the Wasserstein distance #########
   # interpolate partial arc lengths on mesh nodes from partial arc lengths on level curves points
-  A_new <- solve(t(A)%*%A,t(A))
-  interpolated_parc <- A_new%*%parc
+
+  A_new <- function(v){
+    return(solve(t(A)%*%A,t(A)%*%v))
+  }
+
+  interpolated_parc <- A_new(parc)
   # compute partial derivatives of partial arc lengths on level curve points
   P_PD_x = PD_util_P$dx %*% matrix(interpolated_parc, ncol = 1)
   P_PD_x = as.vector(P_PD_x)
