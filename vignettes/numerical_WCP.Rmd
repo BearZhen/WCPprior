@@ -78,7 +78,7 @@ We will now obtain the values of the approximated density at the mesh nodes. To 
 ```{r}
 basis <- result$basis
 dens_val <- result$val 
-dens_mesh <- basis%*%dens_val
+dens_mesh <- basis(dens_val)
 ```
 
 Let us obtain the values of the approximated density at the pixelated mesh:
